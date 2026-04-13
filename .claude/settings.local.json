@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(where gh:*)",
+      "Bash(cmd.exe:*)",
+      "Read(//c/Program Files/GitHub CLI//**)",
+      "Read(//c/Program Files \\(x86\\)/**)",
+      "Read(//c/Users/automatix/AppData/**)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/GitHub CLI/\")",
+      "Bash(gh repo:*)",
+      "Bash(gh label:*)",
+      "Bash(gh issue create --title 'T-01: Backend project scaffolding' --label phase:1-foundation --body ':*)",
+      "Bash(gh issue create --title 'T-02: Configuration module' --label phase:1-foundation --body ':*)",
+      "Bash(gh issue create --title 'T-03: Credential and config templates' --label phase:1-foundation --body ':*)",
+      "Bash(gh issue create --title 'T-04: Audit logging module' --label phase:1-foundation --body ':*)",
+      "Bash(gh issue create --title 'T-05: Scanner module' --label phase:2-ingestion --body ':*)",
+      "Bash(gh issue create --title 'T-06: OCR module' --label phase:2-ingestion --body ':*)",
+      "Bash(gh issue create --title 'T-07: LLM provider abstraction' --label phase:3-classification --body ':*)",
+      "Bash(gh issue create --title 'T-08: Anthropic provider implementation' --label phase:3-classification --body ':*)",
+      "Bash(gh issue create --title 'T-09: Classifier service' --label phase:3-classification --body ':*)",
+      "Bash(gh issue create --title 'T-10: Rule engine' --label phase:3-classification --body ':*)",
+      "Bash(gh issue create --title 'T-12: FileManager module' --label phase:4-pipeline --body ':*)",
+      "Bash(gh issue create --title 'T-29: README with setup instructions' --label phase:7-packaging --body ':*)"
+    ]
+  }
+}
