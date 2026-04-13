@@ -133,6 +133,10 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architec
 **Decision:** `7`-phase roadmap with `29` tickets (`T-01` through `T-29`), tracked as GitHub Issues with phase labels.
 **Rationale:** Phases follow the dependency graph (Foundation → Ingestion → Classification → Pipeline → API → Frontend → Packaging). See `docs/roadmap.md`.
 
+### `DD-06` — Installer Bundling Strategy (`2026-04-13`)
+**Decision:** The Windows installer bundles all runtime dependencies (Python, Tesseract, Ghostscript) so the end user has zero prerequisites to install manually.
+**Rationale:** Minimum effort for the end user. Trade-off: larger installer (~`200`–`300` MB), but zero-setup experience. Python backend will be packaged as standalone executable (via PyInstaller or cx_Freeze). Tesseract and Ghostscript are bundled alongside. Only user-provided requirement: an API key (Claude/OpenAI) unless using a local LLM.
+
 ### `DD-04` — Architecture (`2026-04-13`)
 **Decision:** Modular service architecture with `9` modules, LLM provider abstraction, dependency injection, FastAPI backend as Tauri sidecar.
 **Rationale:** See `docs/architecture.md` for the full living document.
