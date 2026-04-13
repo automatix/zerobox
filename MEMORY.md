@@ -129,6 +129,10 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architec
 | .NET MAUI / WPF | Locks into Microsoft ecosystem; poor AI/OCR library support compared to Python |
 | Local LLM (Ollama) | Interesting for offline use — noted as future idea. Claude API is stronger for document classification today |
 
+### `DD-05` — Roadmap and Ticket Structure (`2026-04-13`)
+**Decision:** `7`-phase roadmap with `29` tickets (`T-01` through `T-29`), tracked as GitHub Issues with phase labels.
+**Rationale:** Phases follow the dependency graph (Foundation → Ingestion → Classification → Pipeline → API → Frontend → Packaging). See `docs/roadmap.md`.
+
 ### `DD-04` — Architecture (`2026-04-13`)
 **Decision:** Modular service architecture with `9` modules, LLM provider abstraction, dependency injection, FastAPI backend as Tauri sidecar.
 **Rationale:** See `docs/architecture.md` for the full living document.
