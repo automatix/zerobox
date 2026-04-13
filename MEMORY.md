@@ -163,6 +163,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-13` — T-03: Credential and Config Templates
+**Anfrage:** `T-03` umsetzen.
+**Durchgeführt:** `backend/.env.example` (Placeholder-Keys) und `backend/config.example.json` (alle Felder mit Defaults) erstellt. `.gitignore` angepasst: `config.json` hinzugefügt, `.env.example` per `!`-Ausnahme whitegelistet.
+**Ergebnis:** `T-03` abgeschlossen und als **Done** geschlossen.
+
 ### `2026-04-13` — T-02: Configuration Module
 **Anfrage:** `T-02` umsetzen.
 **Durchgeführt:** `backend/zerobox/config.py` erstellt mit `AppConfig` (pydantic-settings), Sektionen `ScannerConfig`, `OcrConfig`, `LLMConfig`, `FileManagerConfig`, `AuditConfig`. Laden aus `config.json` mit Fallback auf Defaults, Secrets aus `.env`. Validierung bei Startup (z.B. ungültiger Provider → `ValidationError`). In App Factory integriert, `/config`-Endpoint hinzugefügt.
