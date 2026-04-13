@@ -1,6 +1,8 @@
 # Environment
 .env
 .env.*
+!.env.example
+config.json
 
 # Python
 __pycache__/
