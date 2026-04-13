@@ -154,3 +154,12 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 - `IDEA-04` — **Rule sharing** — export/import rule profiles for community sharing.
 - `IDEA-05` — **Duplicate detection** — flag files that appear to be duplicates of already-filed documents.
 - `IDEA-06` — **Preview pane** — show a thumbnail/preview of the scanned document alongside the classification result in the review table.
+
+---
+
+## Work Log
+
+### `2026-04-13` — GitHub Project Sync Check
+**Anfrage:** Prüfen, ob das GitHub Project (`https://github.com/users/automatix/projects/1`) mit dem Repo `automatix/zerobox` in Sync ist.
+**Durchgeführt:** `gh` CLI lokalisiert (`C:\Program Files\GitHub CLI\gh.exe`), Token-Scopes um `read:project` und `project` erweitert, Project-Inhalt abgefragt.
+**Ergebnis:** Repo und Project sind vollständig verknüpft. Alle `29` Issues (`T-01` bis `T-29`) sind im Project vorhanden.
