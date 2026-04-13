@@ -21,7 +21,17 @@
       "Bash(gh issue create --title 'T-09: Classifier service' --label phase:3-classification --body ':*)",
       "Bash(gh issue create --title 'T-10: Rule engine' --label phase:3-classification --body ':*)",
       "Bash(gh issue create --title 'T-12: FileManager module' --label phase:4-pipeline --body ':*)",
-      "Bash(gh issue create --title 'T-29: README with setup instructions' --label phase:7-packaging --body ':*)"
+      "Bash(gh issue create --title 'T-29: README with setup instructions' --label phase:7-packaging --body ':*)",
+      "Bash(gh project:*)",
+      "Bash(gh issue:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(/c/Program Files/GitHub CLI/gh.exe:*)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/GitHub CLI\")",
+      "Bash(python -c ':*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(python -c \"import zerobox; print\\('import ok'\\)\")",
+      "Bash(python -c \"from zerobox.__main__ import main; print\\('entry point ok'\\)\")"
     ]
   }
 }
