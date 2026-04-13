@@ -163,6 +163,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-13` — T-04: Audit Logging Module
+**Anfrage:** `T-04` umsetzen.
+**Durchgeführt:** `audit/models.py` mit `AuditEntry` Dataclass, `audit/service.py` mit `AuditService` (SQLite). `log()` zum Schreiben, `query()` mit Filtern (action, date range, rule_id, limit). Auto-Erstellung von DB und Verzeichnissen. `10` Unit-Tests, alle grün.
+**Ergebnis:** `T-04` abgeschlossen und als **Done** geschlossen. Phase `1` komplett.
+
 ### `2026-04-13` — T-03: Credential and Config Templates
 **Anfrage:** `T-03` umsetzen.
 **Durchgeführt:** `backend/.env.example` (Placeholder-Keys) und `backend/config.example.json` (alle Felder mit Defaults) erstellt. `.gitignore` angepasst: `config.json` hinzugefügt, `.env.example` per `!`-Ausnahme whitegelistet.
