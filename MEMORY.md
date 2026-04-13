@@ -17,7 +17,7 @@ Based on the OCR-extracted text, the app determines:
 - the **target filename** (following naming rules),
 - the **target folder** (following filing rules).
 
-Classification is powered by an LLM (Claude API) guided by user-defined rule sets.
+Classification is powered by a swappable LLM provider (see `FR-08`) guided by user-defined rule sets.
 
 ### `FR-04` — Review & Approval UI
 Before any file operation is executed, the user sees a summary table:
@@ -72,8 +72,8 @@ All automated decisions (why a file was named X, why it was filed under Y) must 
 ## Design Decisions
 
 ### `DD-01` — Tech Stack (`2026-04-13`)
-**Status:** proposed — awaiting approval.
-See section [Tech Stack Proposal](#tech-stack-proposal) below.
+**Status:** approved.
+See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architecture.md` for the full architecture.
 
 ### `DD-02` — Rule Storage Format (`2026-04-13`)
 **Decision:** JSON files, one file per profile.
@@ -128,6 +128,17 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below.
 | Python + `pywebview` | Lighter than Electron but less mature than Tauri; smaller ecosystem |
 | .NET MAUI / WPF | Locks into Microsoft ecosystem; poor AI/OCR library support compared to Python |
 | Local LLM (Ollama) | Interesting for offline use — noted as future idea. Claude API is stronger for document classification today |
+
+### `DD-04` — Architecture (`2026-04-13`)
+**Decision:** Modular service architecture with `9` modules, LLM provider abstraction, dependency injection, FastAPI backend as Tauri sidecar.
+**Rationale:** See `docs/architecture.md` for the full living document.
+
+---
+
+## Functional Requirements (continued)
+
+### `FR-08` — Swappable LLM Provider
+The AI classification module supports multiple LLM backends (Claude, OpenAI, local models via Ollama) through a provider abstraction. The active provider is selected via `config.llm.provider`. Each provider implements the `LLMProvider` interface (`classify` + `extract_rule`).
 
 ---
 

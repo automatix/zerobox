@@ -12,7 +12,7 @@ Modular service architecture with independent modules communicating through well
 
 - **Scanner** — file ingestion from a configurable input folder
 - **OCR Engine** — text extraction via `ocrmypdf` (Tesseract wrapper)
-- **Classifier** — AI-based naming/filing via Claude API (`anthropic` SDK)
+- **Classifier** — AI-based naming/filing via swappable LLM provider (Claude, OpenAI, Ollama)
 - **Rule Engine** — JSON profile management, pattern matching
 - **File Manager** — rename/move operations
 - **Audit Logger** — SQLite-based action log
@@ -23,3 +23,4 @@ Backend (Python `3.13` + FastAPI) runs as a Tauri sidecar process, communicating
 ## Key Documentation
 
 - `MEMORY.md` — project journal: requirements (`FR-*`), non-functional requirements (`NFR-*`), design decisions (`DD-*`), ideas (`IDEA-*`)
+- `docs/architecture.md` — living architecture document (directory structure, modules, interfaces, data flow, config model). **Update this file with every architectural change.**
