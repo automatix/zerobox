@@ -1,0 +1,24 @@
+{
+  "scanner": {
+    "input_folder": "~/zerobox/inbox",
+    "file_types": [".pdf", ".tiff", ".tif", ".png", ".jpg", ".jpeg"]
+  },
+  "ocr": {
+    "language": "deu+eng",
+    "deskew": true,
+    "optimize": 1
+  },
+  "llm": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-20250514",
+    "temperature": 0.0
+  },
+  "filemanager": {
+    "output_root": "~/zerobox/archive",
+    "conflict_strategy": "rename"
+  },
+  "audit": {
+    "db_path": "~/zerobox/audit.db"
+  },
+  "profiles_dir": "~/zerobox/profiles"
+}
