@@ -163,6 +163,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-13` — T-02: Configuration Module
+**Anfrage:** `T-02` umsetzen.
+**Durchgeführt:** `backend/zerobox/config.py` erstellt mit `AppConfig` (pydantic-settings), Sektionen `ScannerConfig`, `OcrConfig`, `LLMConfig`, `FileManagerConfig`, `AuditConfig`. Laden aus `config.json` mit Fallback auf Defaults, Secrets aus `.env`. Validierung bei Startup (z.B. ungültiger Provider → `ValidationError`). In App Factory integriert, `/config`-Endpoint hinzugefügt.
+**Ergebnis:** `T-02` abgeschlossen und als **Done** geschlossen.
+
 ### `2026-04-13` — T-01: Backend Project Scaffolding
 **Anfrage:** Phase-`1`-Issues auf Ready setzen, `T-01` umsetzen.
 **Durchgeführt:** `T-01` bis `T-04` auf **Ready** gesetzt. `T-01` implementiert: `backend/pyproject.toml`, Package-Struktur mit allen `9` Modulverzeichnissen, `app.py` (FastAPI Factory mit `/health`), `__main__.py` (Entry Point), venv eingerichtet, `python -m zerobox` verifiziert.
