@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["id", "name", "rules"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "description": { "type": "string", "default": "" },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "patterns", "target_name_template", "target_folder_template"],
+        "properties": {
+          "id": { "type": "string" },
+          "patterns": { "type": "array", "items": { "type": "string" } },
+          "target_name_template": { "type": "string" },
+          "target_folder_template": { "type": "string" },
+          "priority": { "type": "integer", "default": 0 },
+          "examples": { "type": "array", "items": { "type": "string" }, "default": [] }
+        }
+      }
+    }
+  }
+}
