@@ -164,6 +164,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-14` — `#12`–`#14`: File Operations & Pipeline (Phase `4`)
+**Request:** Implement Phase `4` — FileManager, Pipeline service, end-to-end audit trail.
+**Done:** `#12`: `FileManagerService` with rename/move, `3` conflict strategies, batch processing (`17` tests). `#13` + `#14`: `PipelineService` orchestrating Intake → OCR → Classifier → FileManager with full audit trail at every step, auto-approve mode (`13` tests).
+**Result:** `#12`–`#14` closed. Phase `4` complete. `114` total tests green.
+
 ### `2026-04-14` — `#7`–`#11`: AI Classification & Rules (Phase `3`)
 **Request:** Implement Phase `3` — LLM provider abstraction, Anthropic provider, classifier service, rule engine, rule learning loop.
 **Done:** `#7`: `LLMProvider` ABC, registry/factory, `ClassificationResult`/`Proposal`/`UserCorrection` models (`7` tests). `#8`: `AnthropicProvider` with Claude API, JSON prompt/response parsing (`12` tests). `#9`: `ClassifierService` orchestrating provider + rules → `Proposal` (`9` tests). `#10`: `RuleService` with CRUD, JSON profiles, pattern matching, validation (`19` tests). `#11`: `learn_from_correction()` method on `ClassifierService` — user correction → LLM extracts rule → persisted (`6` tests). Parallelized: `#7` + `#10` first, then `#8` + `#9`, then `#11`.
