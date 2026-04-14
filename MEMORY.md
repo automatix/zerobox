@@ -164,6 +164,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-14` — `#15`–`#19`: API Layer (Phase `5`)
+**Request:** Implement Phase `5` — FastAPI routes exposing all backend functionality.
+**Done:** `#15`: DI wiring in `dependencies.py` with `lru_cache` factories, app factory updated with router includes (`8` tests). `#16`–`#19` in parallel: Pipeline routes (`4` tests), Proposal routes with in-memory storage + status transitions (`13` tests), Rule profile CRUD routes (`11` tests), Audit log query route (`6` tests). All routes have Pydantic request/response models for OpenAPI docs.
+**Result:** `#15`–`#19` closed. Phase `5` complete. `156` total tests green. Full API at `/docs`.
+
 ### `2026-04-14` — `#12`–`#14`: File Operations & Pipeline (Phase `4`)
 **Request:** Implement Phase `4` — FileManager, Pipeline service, end-to-end audit trail.
 **Done:** `#12`: `FileManagerService` with rename/move, `3` conflict strategies, batch processing (`17` tests). `#13` + `#14`: `PipelineService` orchestrating Intake → OCR → Classifier → FileManager with full audit trail at every step, auto-approve mode (`13` tests).
