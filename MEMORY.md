@@ -164,6 +164,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-14` — `#7`–`#11`: AI Classification & Rules (Phase `3`)
+**Request:** Implement Phase `3` — LLM provider abstraction, Anthropic provider, classifier service, rule engine, rule learning loop.
+**Done:** `#7`: `LLMProvider` ABC, registry/factory, `ClassificationResult`/`Proposal`/`UserCorrection` models (`7` tests). `#8`: `AnthropicProvider` with Claude API, JSON prompt/response parsing (`12` tests). `#9`: `ClassifierService` orchestrating provider + rules → `Proposal` (`9` tests). `#10`: `RuleService` with CRUD, JSON profiles, pattern matching, validation (`19` tests). `#11`: `learn_from_correction()` method on `ClassifierService` — user correction → LLM extracts rule → persisted (`6` tests). Parallelized: `#7` + `#10` first, then `#8` + `#9`, then `#11`.
+**Result:** `#7`–`#11` closed. Phase `3` complete. `84` total tests green.
+
 ### `2026-04-14` — Rename Scanner → Intake (`#30`)
 **Request:** Rename "Scanner" module to "Intake" — the old name was misleading (suggested OCR).
 **Done:** Renamed directory `scanner/` → `intake/`, `ScannedFile` → `IntakeFile`, `ScannerService` → `IntakeService`, `ScannerConfig` → `IntakeConfig`, audit action `"scanned"` → `"intake_discovered"`. Updated all imports, tests, config, docs (`architecture.md`, `roadmap.md`, `CLAUDE.md`, `MEMORY.md`). All `31` tests green.
