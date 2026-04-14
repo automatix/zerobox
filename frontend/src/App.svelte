@@ -3,6 +3,7 @@
   import RuleProfiles from './views/RuleProfiles.svelte';
   import AuditLog from './views/AuditLog.svelte';
   import Settings from './views/Settings.svelte';
+  import ToastContainer from './views/ToastContainer.svelte';
 
   type Tab = 'review' | 'rules' | 'audit' | 'settings';
 
@@ -55,4 +56,6 @@
       <Settings />
     {/if}
   </main>
+
+  <ToastContainer />
 </div>

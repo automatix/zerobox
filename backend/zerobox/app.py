@@ -1,6 +1,7 @@
 """FastAPI app factory."""
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 from zerobox.config import AppConfig, load_config
 
@@ -10,6 +11,29 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Zerobox", version="0.1.0")
     app.state.config = config
     app.state.proposals: dict[str, dict] = {}
+
+    # ------------------------------------------------------------------
+    # Global exception handlers
+    # ------------------------------------------------------------------
+
+    @app.exception_handler(FileNotFoundError)
+    async def not_found_handler(request: Request, exc: FileNotFoundError) -> JSONResponse:
+        return JSONResponse(status_code=404, content={"error": str(exc)})
+
+    @app.exception_handler(ValueError)
+    async def value_error_handler(request: Request, exc: ValueError) -> JSONResponse:
+        return JSONResponse(status_code=400, content={"error": str(exc)})
+
+    @app.exception_handler(Exception)
+    async def general_error_handler(request: Request, exc: Exception) -> JSONResponse:
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Internal server error", "detail": str(exc)},
+        )
+
+    # ------------------------------------------------------------------
+    # Built-in routes
+    # ------------------------------------------------------------------
 
     @app.get("/health")
     async def health() -> dict[str, str]:
