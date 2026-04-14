@@ -33,7 +33,14 @@
       "Bash(python -c \"import zerobox; print\\('import ok'\\)\")",
       "Bash(python -c \"from zerobox.__main__ import main; print\\('entry point ok'\\)\")",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(python -c \" import json,sys issues = json.load\\(sys.stdin\\) for i in sorted\\(issues, key=lambda x: x['number']\\): labels = ', '.join\\(l['name'] for l in i['labels']\\) print\\(f\\\\\"T-{i['number']:02d} {i['title']} [{labels}]\\\\\"\\)\")",
+      "Bash(python -m pytest tests/unit/test_scanner.py -v)",
+      "Bash(pip install:*)",
+      "Bash(python -m pytest tests/unit/test_ocr.py -v)",
+      "Bash(pip show:*)",
+      "Bash(python -m pytest tests/unit/test_scanner.py tests/unit/test_ocr.py -v)",
+      "Bash(python -m pytest tests/unit/test_scanner.py tests/unit/test_ocr.py tests/unit/test_audit.py -v)"
     ]
   }
 }

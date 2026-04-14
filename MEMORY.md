@@ -163,6 +163,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-14` — T-05 & T-06: Scanner + OCR Modules (Phase `2`)
+**Request:** Implement Phase `2` (T-05 and T-06 in parallel).
+**Done:** `T-05`: `scanner/models.py` with `ScannedFile` dataclass, `scanner/service.py` with `ScannerService` (reads input folder, filters by extension, optional audit logging). `11` unit tests. `T-06`: `ocr/models.py` with `OcrResult` dataclass, `ocr/service.py` with `OcrService` (async `ocrmypdf` integration via `to_thread`, sidecar text extraction, graceful failure handling). `10` unit tests. All `31` tests green.
+**Result:** `T-05` and `T-06` closed. Phase `2` complete.
+
 ### `2026-04-13` — T-04: Audit Logging Module
 **Anfrage:** `T-04` umsetzen.
 **Durchgeführt:** `audit/models.py` mit `AuditEntry` Dataclass, `audit/service.py` mit `AuditService` (SQLite). `log()` zum Schreiben, `query()` mit Filtern (action, date range, rule_id, limit). Auto-Erstellung von DB und Verzeichnissen. `10` Unit-Tests, alle grün.
