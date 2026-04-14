@@ -1,0 +1,729 @@
+{
+	"info": {
+		"_postman_id": "zerobox-collection-v1",
+		"name": "Zerobox API",
+		"description": "Complete API collection for Zerobox — AI-powered scan processing app. Covers health checks, pipeline execution, proposal management, rule profiles, and audit logging.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health & Config",
+			"description": "Server health check and configuration endpoints.",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": ["{{base_url}}"],
+							"path": ["health"]
+						},
+						"description": "Returns the current health status of the Zerobox backend. Use this to verify the server is running and responsive."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status is ok\", function() {",
+									"    pm.response.to.have.status(200);",
+									"    var json = pm.response.json();",
+									"    pm.expect(json.status).to.eql(\"ok\");",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Get Config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/config",
+							"host": ["{{base_url}}"],
+							"path": ["config"]
+						},
+						"description": "Returns the current Zerobox configuration including input folder, output folder, LLM provider settings, and OCR options."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Config returned successfully\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Pipeline",
+			"description": "Endpoints for running the scan processing pipeline (OCR → classify → propose).",
+			"item": [
+				{
+					"name": "Run Pipeline",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/pipeline/run",
+							"host": ["{{base_url}}"],
+							"path": ["pipeline", "run"]
+						},
+						"description": "Runs the full scan processing pipeline: ingests files from the input folder, performs OCR, classifies documents via AI, and generates rename/move proposals. Does NOT execute file operations — proposals must be reviewed first."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Pipeline run successful\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Save first proposal_id\", function() {",
+									"    var json = pm.response.json();",
+									"    if (json.proposals && json.proposals.length > 0) {",
+									"        pm.environment.set(\"proposal_id\", json.proposals[0].id);",
+									"    }",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Run Pipeline & Execute (auto-approve)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/pipeline/run-and-execute?auto_approve=true",
+							"host": ["{{base_url}}"],
+							"path": ["pipeline", "run-and-execute"],
+							"query": [
+								{
+									"key": "auto_approve",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Runs the full pipeline and immediately executes all proposals without user review. Use with caution — files will be renamed and moved automatically."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Pipeline run-and-execute successful\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Run Pipeline & Execute (manual review)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/pipeline/run-and-execute?auto_approve=false",
+							"host": ["{{base_url}}"],
+							"path": ["pipeline", "run-and-execute"],
+							"query": [
+								{
+									"key": "auto_approve",
+									"value": "false"
+								}
+							]
+						},
+						"description": "Runs the full pipeline and executes only previously approved proposals. Pending proposals remain for manual review."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Pipeline run-and-execute successful\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Proposals",
+			"description": "Manage rename/move proposals generated by the pipeline. Review, approve, correct, or reject proposals before executing file operations.",
+			"item": [
+				{
+					"name": "List All Proposals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/proposals",
+							"host": ["{{base_url}}"],
+							"path": ["proposals"]
+						},
+						"description": "Returns all proposals regardless of status (pending, approved, corrected, rejected, executed)."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Proposals listed successfully\", function() {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "List Pending Proposals",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/proposals?status=pending",
+							"host": ["{{base_url}}"],
+							"path": ["proposals"],
+							"query": [
+								{
+									"key": "status",
+									"value": "pending"
+								}
+							]
+						},
+						"description": "Returns only proposals with status 'pending' — those awaiting user review."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Pending proposals listed\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Get Proposal by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/proposals/{{proposal_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["proposals", "{{proposal_id}}"]
+						},
+						"description": "Returns details of a single proposal including original filename, proposed name, proposed folder, OCR text excerpt, and current status."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Proposal retrieved\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Approve Proposal",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"approved\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/proposals/{{proposal_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["proposals", "{{proposal_id}}"]
+						},
+						"description": "Approves a pending proposal as-is. The proposed name and folder will be used when proposals are executed."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Proposal approved\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Correct Proposal",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"corrected\",\n    \"corrected_name\": \"new_name.pdf\",\n    \"corrected_folder\": \"NewFolder\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/proposals/{{proposal_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["proposals", "{{proposal_id}}"]
+						},
+						"description": "Corrects a pending proposal with a user-provided name and/or folder. The corrected values override the AI-generated suggestions and feed back into the rule engine for learning."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Proposal corrected\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Execute Proposals",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/proposals/execute",
+							"host": ["{{base_url}}"],
+							"path": ["proposals", "execute"]
+						},
+						"description": "Executes all approved and corrected proposals — performs the actual file rename and move operations. Pending and rejected proposals are skipped."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Proposals executed\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Rule Profiles",
+			"description": "Manage JSON-based rule profiles for document classification. Profiles contain pattern-matching rules that guide the AI classifier and can be learned from user corrections.",
+			"item": [
+				{
+					"name": "List All Profiles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/rules/profiles",
+							"host": ["{{base_url}}"],
+							"path": ["rules", "profiles"]
+						},
+						"description": "Returns all available rule profiles with their metadata and rule counts."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Profiles listed\", function() {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Get Profile by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/rules/profiles/{{profile_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["rules", "profiles", "{{profile_id}}"]
+						},
+						"description": "Returns a single rule profile including all its rules and metadata."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Profile retrieved\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Create Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"test-profile\",\n    \"name\": \"Test Profile\",\n    \"description\": \"A test profile\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/rules/profiles",
+							"host": ["{{base_url}}"],
+							"path": ["rules", "profiles"]
+						},
+						"description": "Creates a new rule profile. The profile starts empty — add rules via the 'Add Rule to Profile' endpoint."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Profile created\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Save profile_id\", function() {",
+									"    var json = pm.response.json();",
+									"    if (json.id) {",
+									"        pm.environment.set(\"profile_id\", json.id);",
+									"    }",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Delete Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/rules/profiles/{{profile_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["rules", "profiles", "{{profile_id}}"]
+						},
+						"description": "Deletes a rule profile and all its associated rules. This action is irreversible."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Profile deleted\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Add Rule to Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pattern\": \"invoice|rechnung|facture\",\n    \"match_field\": \"ocr_text\",\n    \"target_name\": \"{date}_Invoice_{vendor}.pdf\",\n    \"target_folder\": \"Invoices/{year}\",\n    \"priority\": 10,\n    \"description\": \"Match invoices by keyword and file into yearly folders\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/rules/profiles/{{profile_id}}/rules",
+							"host": ["{{base_url}}"],
+							"path": ["rules", "profiles", "{{profile_id}}", "rules"]
+						},
+						"description": "Adds a new classification rule to an existing profile. Rules define pattern-matching logic for automatic document naming and filing."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Rule added\", function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Save rule_id\", function() {",
+									"    var json = pm.response.json();",
+									"    if (json.id) {",
+									"        pm.environment.set(\"rule_id\", json.id);",
+									"    }",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Delete Rule from Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/rules/profiles/{{profile_id}}/rules/{{rule_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["rules", "profiles", "{{profile_id}}", "rules", "{{rule_id}}"]
+						},
+						"description": "Removes a single rule from a profile by rule ID."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Rule deleted\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Audit Log",
+			"description": "Query the SQLite-based audit log for tracked actions (classified, approved, corrected, rejected, file_moved, file_renamed, etc.).",
+			"item": [
+				{
+					"name": "Get Full Audit Log",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/audit/log",
+							"host": ["{{base_url}}"],
+							"path": ["audit", "log"]
+						},
+						"description": "Returns the full audit log with all recorded actions, ordered by timestamp descending."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Audit log retrieved\", function() {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Get Audit Log — Classified Actions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/audit/log?action=classified",
+							"host": ["{{base_url}}"],
+							"path": ["audit", "log"],
+							"query": [
+								{
+									"key": "action",
+									"value": "classified"
+								}
+							]
+						},
+						"description": "Returns audit log entries filtered to 'classified' actions only."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Filtered audit log retrieved\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Get Audit Log — Limited",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/audit/log?limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["audit", "log"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Returns the most recent 10 audit log entries."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Limited audit log retrieved\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Get Audit Log — File Moved (Limited)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/audit/log?action=file_moved&limit=50",
+							"host": ["{{base_url}}"],
+							"path": ["audit", "log"],
+							"query": [
+								{
+									"key": "action",
+									"value": "file_moved"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						},
+						"description": "Returns up to 50 audit log entries for 'file_moved' actions."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Filtered and limited audit log retrieved\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				}
+			]
+		}
+	]
+}
