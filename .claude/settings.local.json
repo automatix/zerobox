@@ -31,7 +31,9 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(python -c \"import zerobox; print\\('import ok'\\)\")",
-      "Bash(python -c \"from zerobox.__main__ import main; print\\('entry point ok'\\)\")"
+      "Bash(python -c \"from zerobox.__main__ import main; print\\('entry point ok'\\)\")",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
