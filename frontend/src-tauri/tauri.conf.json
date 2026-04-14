@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicklimmern/tauri-v2/main/tooling/cli/schema.json",
+  "productName": "Zerobox",
+  "version": "0.1.0",
+  "identifier": "com.zerobox.app",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "title": "Zerobox",
+    "windows": [
+      {
+        "label": "main",
+        "title": "Zerobox",
+        "width": 1200,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": []
+  }
+}
