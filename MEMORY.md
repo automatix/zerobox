@@ -164,10 +164,15 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-14` — `#21`, `#27`: Tauri Sidecar + Windows Installer
+**Request:** Install Rust, close remaining tickets.
+**Done:** Installed Rust `1.94.1` + MSVC Build Tools. `#21`: Tauri `2` Rust project with shell plugin for sidecar management, `cargo check` passes. `#27`: Build scripts (`scripts/build-installer.ps1` + `.sh`) — PyInstaller sidecar + Tauri MSI/NSIS bundler.
+**Result:** `#21`, `#27` closed. **All `32` tickets closed.** Roadmap complete.
+
 ### `2026-04-14` — `#27`–`#29`: Packaging & Polish (Phase `7`)
 **Request:** Close remaining tickets and wrap up.
-**Done:** `#28`: Global exception handlers (404/400/500) + frontend toast notification system (`3` tests). `#29`: Comprehensive README with setup guide, architecture, testing, config reference. `#27` (Windows installer) deferred — needs Rust.
-**Result:** `#28`, `#29` closed. `#21`, `#27` open (need Rust). `175` total tests (`159` unit + `16` BDD). Roadmap functionally complete.
+**Done:** `#28`: Global exception handlers (404/400/500) + frontend toast notification system (`3` tests). `#29`: Comprehensive README with setup guide, architecture, testing, config reference.
+**Result:** `#28`, `#29` closed. `175` total tests (`159` unit + `16` BDD).
 
 ### `2026-04-14` — `#20`–`#26`: Frontend + `#31` Postman + `#32` Gherkin (Phase `6`)
 **Request:** Implement Phase `6` (Frontend), plus Postman collection and Gherkin BDD tests in parallel.
