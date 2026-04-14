@@ -130,7 +130,7 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architec
 | Local LLM (Ollama) | Interesting for offline use — noted as future idea. Claude API is stronger for document classification today |
 
 ### `DD-05` — Roadmap and Ticket Structure (`2026-04-13`)
-**Decision:** `7`-phase roadmap with `29` tickets (`T-01` through `T-29`), tracked as GitHub Issues with phase labels.
+**Decision:** `7`-phase roadmap with `29` tickets (`#1` through `#29`), tracked as GitHub Issues with phase labels.
 **Rationale:** Phases follow the dependency graph (Foundation → Ingestion → Classification → Pipeline → API → Frontend → Packaging). See `docs/roadmap.md`.
 
 ### `DD-06` — Installer Bundling Strategy (`2026-04-13`)
@@ -169,32 +169,32 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 **Done:** Renamed directory `scanner/` → `intake/`, `ScannedFile` → `IntakeFile`, `ScannerService` → `IntakeService`, `ScannerConfig` → `IntakeConfig`, audit action `"scanned"` → `"intake_discovered"`. Updated all imports, tests, config, docs (`architecture.md`, `roadmap.md`, `CLAUDE.md`, `MEMORY.md`). All `31` tests green.
 **Result:** `#30` closed. Naming consistent across the entire project.
 
-### `2026-04-14` — T-05 & T-06: Intake + OCR Modules (Phase `2`)
-**Request:** Implement Phase `2` (T-05 and T-06 in parallel).
-**Done:** `T-05`: `scanner/models.py` with `ScannedFile` dataclass, `scanner/service.py` with `ScannerService` (reads input folder, filters by extension, optional audit logging). `11` unit tests. `T-06`: `ocr/models.py` with `OcrResult` dataclass, `ocr/service.py` with `OcrService` (async `ocrmypdf` integration via `to_thread`, sidecar text extraction, graceful failure handling). `10` unit tests. All `31` tests green.
-**Result:** `T-05` and `T-06` closed. Phase `2` complete.
+### `2026-04-14` — `#5` & `#6`: Intake + OCR Modules (Phase `2`)
+**Request:** Implement Phase `2` (`#5` and `#6` in parallel).
+**Done:** `#5`: `intake/models.py` with `IntakeFile` dataclass, `intake/service.py` with `IntakeService` (reads input folder, filters by extension, optional audit logging). `11` unit tests. `#6`: `ocr/models.py` with `OcrResult` dataclass, `ocr/service.py` with `OcrService` (async `ocrmypdf` integration via `to_thread`, sidecar text extraction, graceful failure handling). `10` unit tests. All `31` tests green.
+**Result:** `#5` and `#6` closed. Phase `2` complete.
 
-### `2026-04-13` — T-04: Audit Logging Module
-**Anfrage:** `T-04` umsetzen.
+### `2026-04-13` — `#4`: Audit Logging Module
+**Anfrage:** `#4` umsetzen.
 **Durchgeführt:** `audit/models.py` mit `AuditEntry` Dataclass, `audit/service.py` mit `AuditService` (SQLite). `log()` zum Schreiben, `query()` mit Filtern (action, date range, rule_id, limit). Auto-Erstellung von DB und Verzeichnissen. `10` Unit-Tests, alle grün.
-**Ergebnis:** `T-04` abgeschlossen und als **Done** geschlossen. Phase `1` komplett.
+**Ergebnis:** `#4` abgeschlossen und als **Done** geschlossen. Phase `1` komplett.
 
-### `2026-04-13` — T-03: Credential and Config Templates
-**Anfrage:** `T-03` umsetzen.
+### `2026-04-13` — `#3`: Credential and Config Templates
+**Anfrage:** `#3` umsetzen.
 **Durchgeführt:** `backend/.env.example` (Placeholder-Keys) und `backend/config.example.json` (alle Felder mit Defaults) erstellt. `.gitignore` angepasst: `config.json` hinzugefügt, `.env.example` per `!`-Ausnahme whitegelistet.
-**Ergebnis:** `T-03` abgeschlossen und als **Done** geschlossen.
+**Ergebnis:** `#3` abgeschlossen und als **Done** geschlossen.
 
-### `2026-04-13` — T-02: Configuration Module
-**Anfrage:** `T-02` umsetzen.
+### `2026-04-13` — `#2`: Configuration Module
+**Anfrage:** `#2` umsetzen.
 **Durchgeführt:** `backend/zerobox/config.py` erstellt mit `AppConfig` (pydantic-settings), Sektionen `IntakeConfig`, `OcrConfig`, `LLMConfig`, `FileManagerConfig`, `AuditConfig`. Laden aus `config.json` mit Fallback auf Defaults, Secrets aus `.env`. Validierung bei Startup (z.B. ungültiger Provider → `ValidationError`). In App Factory integriert, `/config`-Endpoint hinzugefügt.
-**Ergebnis:** `T-02` abgeschlossen und als **Done** geschlossen.
+**Ergebnis:** `#2` abgeschlossen und als **Done** geschlossen.
 
-### `2026-04-13` — T-01: Backend Project Scaffolding
-**Anfrage:** Phase-`1`-Issues auf Ready setzen, `T-01` umsetzen.
-**Durchgeführt:** `T-01` bis `T-04` auf **Ready** gesetzt. `T-01` implementiert: `backend/pyproject.toml`, Package-Struktur mit allen `9` Modulverzeichnissen, `app.py` (FastAPI Factory mit `/health`), `__main__.py` (Entry Point), venv eingerichtet, `python -m zerobox` verifiziert.
-**Ergebnis:** `T-01` abgeschlossen und als **Done** geschlossen. Python `3.14.2` ist auf dem System (statt `3.13` — kompatibel, da `requires-python = ">=3.13"`).
+### `2026-04-13` — `#1`: Backend Project Scaffolding
+**Anfrage:** Phase-`1`-Issues auf Ready setzen, `#1` umsetzen.
+**Durchgeführt:** `#1` bis `#4` auf **Ready** gesetzt. `#1` implementiert: `backend/pyproject.toml`, Package-Struktur mit allen `9` Modulverzeichnissen, `app.py` (FastAPI Factory mit `/health`), `__main__.py` (Entry Point), venv eingerichtet, `python -m zerobox` verifiziert.
+**Ergebnis:** `#1` abgeschlossen und als **Done** geschlossen. Python `3.14.2` ist auf dem System (statt `3.13` — kompatibel, da `requires-python = ">=3.13"`).
 
 ### `2026-04-13` — GitHub Project Sync Check
 **Anfrage:** Prüfen, ob das GitHub Project (`https://github.com/users/automatix/projects/1`) mit dem Repo `automatix/zerobox` in Sync ist.
 **Durchgeführt:** `gh` CLI lokalisiert (`C:\Program Files\GitHub CLI\gh.exe`), Token-Scopes um `read:project` und `project` erweitert, Project-Inhalt abgefragt.
-**Ergebnis:** Repo und Project sind vollständig verknüpft. Alle `29` Issues (`T-01` bis `T-29`) sind im Project vorhanden.
+**Ergebnis:** Repo und Project sind vollständig verknüpft. Alle `29` Issues (`#1` bis `#29`) sind im Project vorhanden.
