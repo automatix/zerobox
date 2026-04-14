@@ -158,6 +158,7 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 - `IDEA-04` — **Rule sharing** — export/import rule profiles for community sharing.
 - `IDEA-05` — **Duplicate detection** — flag files that appear to be duplicates of already-filed documents.
 - `IDEA-06` — **Preview pane** — show a thumbnail/preview of the scanned document alongside the classification result in the review table.
+- `IDEA-07` — **Test coverage tooling** — add `pytest-cov` to dev dependencies and configure coverage reporting.
 
 ---
 
