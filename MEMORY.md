@@ -164,6 +164,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-14` — `#20`–`#26`: Frontend + `#31` Postman + `#32` Gherkin (Phase `6`)
+**Request:** Implement Phase `6` (Frontend), plus Postman collection and Gherkin BDD tests in parallel.
+**Done:** `#20`–`#26`: Svelte `5` + Vite + Tailwind CSS `4` + Tauri `2` config (JS-only). `5` views: ReviewTable, CorrectionDialog, RuleProfiles, AuditLog, Settings. API client + TypeScript types. Build succeeds. `#21` (Tauri sidecar) deferred — Rust not installed. `#31`: Postman collection with `20` requests in `5` folders + local environment. `#32`: `16` BDD scenarios across `4` feature files with pytest-bdd.
+**Result:** `#20`, `#22`–`#26`, `#31`, `#32` closed. `#21` open (needs Rust). `172` total tests (`156` unit + `16` BDD).
+
 ### `2026-04-14` — `#15`–`#19`: API Layer (Phase `5`)
 **Request:** Implement Phase `5` — FastAPI routes exposing all backend functionality.
 **Done:** `#15`: DI wiring in `dependencies.py` with `lru_cache` factories, app factory updated with router includes (`8` tests). `#16`–`#19` in parallel: Pipeline routes (`4` tests), Proposal routes with in-memory storage + status transitions (`13` tests), Rule profile CRUD routes (`11` tests), Audit log query route (`6` tests). All routes have Pydantic request/response models for OpenAPI docs.
