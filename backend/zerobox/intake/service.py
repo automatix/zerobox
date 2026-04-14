@@ -1,29 +1,29 @@
-"""Scanner service — file ingestion from a configurable input folder (FR-01)."""
+"""Intake service — file discovery from a configurable input folder (FR-01)."""
 
 from __future__ import annotations
 
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from zerobox.scanner.models import ScannedFile
+from zerobox.intake.models import IntakeFile
 
 if TYPE_CHECKING:
     from zerobox.audit.service import AuditService
-    from zerobox.config import ScannerConfig
+    from zerobox.config import IntakeConfig
 
 
-class ScannerService:
+class IntakeService:
     """Reads supported files from the configured input folder."""
 
     def __init__(
         self,
-        config: ScannerConfig,
+        config: IntakeConfig,
         audit: AuditService | None = None,
     ) -> None:
         self._config = config
         self._audit = audit
 
-    def scan(self) -> list[ScannedFile]:
+    def scan(self) -> list[IntakeFile]:
         """Scan the input folder and return a list of supported files.
 
         Only top-level files are considered; subdirectories are skipped.
@@ -39,7 +39,7 @@ class ScannerService:
 
         allowed = {ext.lower() for ext in self._config.file_types}
 
-        results: list[ScannedFile] = []
+        results: list[IntakeFile] = []
         for entry in input_folder.iterdir():
             if not entry.is_file():
                 continue
@@ -48,19 +48,22 @@ class ScannerService:
                 continue
 
             stat = entry.stat()
-            scanned = ScannedFile(
+            intake_file = IntakeFile(
                 path=entry.resolve(),
                 file_type=entry.suffix.lower(),
                 size_bytes=stat.st_size,
                 modified_at=datetime.fromtimestamp(stat.st_mtime),
             )
-            results.append(scanned)
+            results.append(intake_file)
 
             if self._audit is not None:
                 self._audit.log(
-                    action="scanned",
-                    source=str(scanned.path),
-                    details={"size_bytes": scanned.size_bytes, "file_type": scanned.file_type},
+                    action="intake_discovered",
+                    source=str(intake_file.path),
+                    details={
+                        "size_bytes": intake_file.size_bytes,
+                        "file_type": intake_file.file_type,
+                    },
                 )
 
         results.sort(key=lambda f: f.path.name)

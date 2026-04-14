@@ -1,7 +1,7 @@
 # Zerobox — Architecture
 
 > Living document. Updated with every architectural change.
-> Last updated: `2026-04-13`
+> Last updated: `2026-04-14`
 
 ---
 
@@ -28,10 +28,10 @@ zerobox/
 │   │   ├── app.py                  # FastAPI app factory
 │   │   ├── config.py               # Pydantic settings (all config + defaults)
 │   │   │
-│   │   ├── scanner/                # Module: file ingestion
+│   │   ├── intake/                 # Module: file discovery
 │   │   │   ├── __init__.py
 │   │   │   ├── service.py
-│   │   │   └── models.py           # ScannedFile
+│   │   │   └── models.py           # IntakeFile
 │   │   │
 │   │   ├── ocr/                    # Module: OCR processing
 │   │   │   ├── __init__.py
@@ -108,7 +108,7 @@ zerobox/
 
 | Module | Responsibility | Key Types |
 |---|---|---|
-| `scanner` | Read files from configurable input folder | `ScannedFile` |
+| `intake` | Discover files from configurable input folder | `IntakeFile` |
 | `ocr` | Extract text via `ocrmypdf` (Tesseract wrapper) | `OcrResult` |
 | `classifier` | AI-based naming + filing proposals | `Proposal`, `ClassificationResult` |
 | `classifier/providers` | Swappable LLM backends | `LLMProvider` (abstract) |
@@ -126,9 +126,9 @@ Each module exposes a `service.py` with its public interface. Modules do not imp
 
 ```
 ┌──────────┐    ┌──────┐    ┌────────────┐    ┌─────────┐    ┌─────────────┐
-│ Scanner  │───>│ OCR  │───>│ Classifier │───>│ Review  │───>│ FileManager │
+│ Intake   │───>│ OCR  │───>│ Classifier │───>│ Review  │───>│ FileManager │
 │          │    │      │    │            │    │ (UI)    │    │             │
-│ yields   │    │ adds │    │ proposes   │    │ approve │    │ executes    │
+│ discovers│    │ adds │    │ proposes   │    │ approve │    │ executes    │
 │ files    │    │ text │    │ name+path  │    │ correct │    │ rename+move │
 └──────────┘    └──────┘    └────────────┘    └─────────┘    └─────────────┘
                                                    │
@@ -141,7 +141,7 @@ Each module exposes a `service.py` with its public interface. Modules do not imp
 All steps ──────────────────────────────────> Audit Logger
 ```
 
-`1.` **Scanner** reads all supported files from the input folder.
+`1.` **Intake** discovers all supported files from the input folder.
 `2.` **OCR** processes each file → searchable PDF + extracted text.
 `3.` **Classifier** sends the text + known rules to the configured LLM → receives a `Proposal` (name, folder, confidence).
 `4.` **Review UI** shows proposals in a table. User approves or corrects.
@@ -244,7 +244,7 @@ class AuditEntry:
 
 ```jsonc
 {
-  "scanner": {
+  "intake": {
     "input_folder": "~/zerobox/inbox",
     "file_types": [".pdf", ".tiff", ".tif", ".png", ".jpg", ".jpeg"]
   },
@@ -288,12 +288,12 @@ No globals, no singletons. All modules receive dependencies via constructor inje
 ```python
 def get_config() -> AppConfig: ...
 def get_audit(config) -> AuditService: ...
-def get_scanner(config) -> ScannerService: ...
+def get_intake(config) -> IntakeService: ...
 def get_ocr(config) -> OcrService: ...
 def get_provider(config) -> LLMProvider: ...       # factory-based
 def get_rules(config) -> RuleService: ...
 def get_classifier(provider, rules) -> ClassifierService: ...
-def get_pipeline(scanner, ocr, classifier, ...) -> PipelineService: ...
+def get_pipeline(intake, ocr, classifier, ...) -> PipelineService: ...
 ```
 
 ---

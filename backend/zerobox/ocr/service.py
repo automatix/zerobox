@@ -14,7 +14,7 @@ from zerobox.ocr.models import OcrResult
 if TYPE_CHECKING:
     from zerobox.audit.service import AuditService
     from zerobox.config import OcrConfig
-    from zerobox.scanner.models import ScannedFile
+    from zerobox.intake.models import IntakeFile
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class OcrService:
             sidecar=sidecar_path,
         )
 
-    async def process(self, file: ScannedFile) -> OcrResult:
+    async def process(self, file: IntakeFile) -> OcrResult:
         """Run OCR on a single scanned file and return the result."""
         self._output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -93,7 +93,7 @@ class OcrService:
                 error=str(exc),
             )
 
-    async def process_batch(self, files: list[ScannedFile]) -> list[OcrResult]:
+    async def process_batch(self, files: list[IntakeFile]) -> list[OcrResult]:
         """Process multiple scanned files sequentially."""
         results: list[OcrResult] = []
         for file in files:

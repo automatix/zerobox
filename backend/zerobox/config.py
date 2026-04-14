@@ -8,7 +8,7 @@ from pydantic import BaseModel, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class ScannerConfig(BaseModel):
+class IntakeConfig(BaseModel):
     input_folder: Path = Path.home() / "zerobox" / "inbox"
     file_types: list[str] = [".pdf", ".tiff", ".tif", ".png", ".jpg", ".jpeg"]
 
@@ -41,7 +41,7 @@ class AppConfig(BaseSettings):
         extra="ignore",
     )
 
-    scanner: ScannerConfig = ScannerConfig()
+    intake: IntakeConfig = IntakeConfig()
     ocr: OcrConfig = OcrConfig()
     llm: LLMConfig = LLMConfig()
     filemanager: FileManagerConfig = FileManagerConfig()

@@ -48,7 +48,7 @@ All paths, API endpoints, OCR settings, etc. are configurable. Defaults are prov
 
 ### `NFR-01` — Modular Architecture
 The system is composed of independent, atomic services/modules:
-- **Scanner** (file ingestion)
+- **Intake** (file discovery)
 - **OCR Engine** (text extraction)
 - **Classifier** (AI-based naming/filing)
 - **Rule Engine** (profile management)
@@ -164,7 +164,12 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
-### `2026-04-14` — T-05 & T-06: Scanner + OCR Modules (Phase `2`)
+### `2026-04-14` — Rename Scanner → Intake (`#30`)
+**Request:** Rename "Scanner" module to "Intake" — the old name was misleading (suggested OCR).
+**Done:** Renamed directory `scanner/` → `intake/`, `ScannedFile` → `IntakeFile`, `ScannerService` → `IntakeService`, `ScannerConfig` → `IntakeConfig`, audit action `"scanned"` → `"intake_discovered"`. Updated all imports, tests, config, docs (`architecture.md`, `roadmap.md`, `CLAUDE.md`, `MEMORY.md`). All `31` tests green.
+**Result:** `#30` closed. Naming consistent across the entire project.
+
+### `2026-04-14` — T-05 & T-06: Intake + OCR Modules (Phase `2`)
 **Request:** Implement Phase `2` (T-05 and T-06 in parallel).
 **Done:** `T-05`: `scanner/models.py` with `ScannedFile` dataclass, `scanner/service.py` with `ScannerService` (reads input folder, filters by extension, optional audit logging). `11` unit tests. `T-06`: `ocr/models.py` with `OcrResult` dataclass, `ocr/service.py` with `OcrService` (async `ocrmypdf` integration via `to_thread`, sidecar text extraction, graceful failure handling). `10` unit tests. All `31` tests green.
 **Result:** `T-05` and `T-06` closed. Phase `2` complete.
@@ -181,7 +186,7 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ### `2026-04-13` — T-02: Configuration Module
 **Anfrage:** `T-02` umsetzen.
-**Durchgeführt:** `backend/zerobox/config.py` erstellt mit `AppConfig` (pydantic-settings), Sektionen `ScannerConfig`, `OcrConfig`, `LLMConfig`, `FileManagerConfig`, `AuditConfig`. Laden aus `config.json` mit Fallback auf Defaults, Secrets aus `.env`. Validierung bei Startup (z.B. ungültiger Provider → `ValidationError`). In App Factory integriert, `/config`-Endpoint hinzugefügt.
+**Durchgeführt:** `backend/zerobox/config.py` erstellt mit `AppConfig` (pydantic-settings), Sektionen `IntakeConfig`, `OcrConfig`, `LLMConfig`, `FileManagerConfig`, `AuditConfig`. Laden aus `config.json` mit Fallback auf Defaults, Secrets aus `.env`. Validierung bei Startup (z.B. ungültiger Provider → `ValidationError`). In App Factory integriert, `/config`-Endpoint hinzugefügt.
 **Ergebnis:** `T-02` abgeschlossen und als **Done** geschlossen.
 
 ### `2026-04-13` — T-01: Backend Project Scaffolding

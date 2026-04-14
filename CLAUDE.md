@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Modular service architecture with independent modules communicating through well-defined interfaces:
 
-- **Scanner** — file ingestion from a configurable input folder
+- **Intake** — file discovery from a configurable input folder
 - **OCR Engine** — text extraction via `ocrmypdf` (Tesseract wrapper)
 - **Classifier** — AI-based naming/filing via swappable LLM provider (Claude, OpenAI, Ollama)
 - **Rule Engine** — JSON profile management, pattern matching

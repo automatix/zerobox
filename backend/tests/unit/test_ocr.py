@@ -9,7 +9,7 @@ import pytest
 from zerobox.config import OcrConfig
 from zerobox.ocr.models import OcrResult
 from zerobox.ocr.service import OcrService
-from zerobox.scanner.models import ScannedFile
+from zerobox.intake.models import IntakeFile
 
 
 @pytest.fixture
@@ -18,11 +18,11 @@ def ocr_config() -> OcrConfig:
 
 
 @pytest.fixture
-def scanned_file(tmp_path: Path) -> ScannedFile:
+def scanned_file(tmp_path: Path) -> IntakeFile:
     pdf = tmp_path / "input" / "scan.pdf"
     pdf.parent.mkdir(parents=True, exist_ok=True)
     pdf.write_bytes(b"%PDF-1.4 fake content")
-    return ScannedFile(
+    return IntakeFile(
         path=pdf,
         file_type=".pdf",
         size_bytes=pdf.stat().st_size,
@@ -71,7 +71,7 @@ class TestOcrService:
     async def test_successful_processing(
         self,
         ocr_service: OcrService,
-        scanned_file: ScannedFile,
+        scanned_file: IntakeFile,
         output_dir: Path,
     ) -> None:
         sidecar_path = output_dir / "scan.txt"
@@ -98,7 +98,7 @@ class TestOcrService:
     async def test_failed_processing(
         self,
         ocr_service: OcrService,
-        scanned_file: ScannedFile,
+        scanned_file: IntakeFile,
         output_dir: Path,
     ) -> None:
         with patch(
@@ -122,7 +122,7 @@ class TestOcrService:
         """Output PDF uses the input file stem with .pdf extension."""
         image = tmp_path / "photo.tiff"
         image.write_bytes(b"fake tiff")
-        file = ScannedFile(
+        file = IntakeFile(
             path=image,
             file_type=".tiff",
             size_bytes=9,
@@ -144,7 +144,7 @@ class TestOcrService:
     async def test_config_values_passed_to_ocrmypdf(
         self,
         output_dir: Path,
-        scanned_file: ScannedFile,
+        scanned_file: IntakeFile,
     ) -> None:
         config = OcrConfig(language="fra", deskew=False, optimize=2)
         service = OcrService(config=config, output_dir=output_dir)
@@ -178,10 +178,10 @@ class TestOcrService:
         bad_file.write_bytes(b"%PDF")
 
         files = [
-            ScannedFile(
+            IntakeFile(
                 path=good_file, file_type=".pdf", size_bytes=4, modified_at=datetime.now()
             ),
-            ScannedFile(
+            IntakeFile(
                 path=bad_file, file_type=".pdf", size_bytes=4, modified_at=datetime.now()
             ),
         ]
@@ -212,7 +212,7 @@ class TestOcrService:
         self,
         ocr_config: OcrConfig,
         output_dir: Path,
-        scanned_file: ScannedFile,
+        scanned_file: IntakeFile,
     ) -> None:
         mock_audit = MagicMock()
         service = OcrService(config=ocr_config, output_dir=output_dir, audit=mock_audit)
@@ -238,7 +238,7 @@ class TestOcrService:
         self,
         ocr_config: OcrConfig,
         output_dir: Path,
-        scanned_file: ScannedFile,
+        scanned_file: IntakeFile,
     ) -> None:
         mock_audit = MagicMock()
         service = OcrService(config=ocr_config, output_dir=output_dir, audit=mock_audit)
@@ -255,7 +255,7 @@ class TestOcrService:
     async def test_no_audit_service_does_not_crash(
         self,
         ocr_service: OcrService,
-        scanned_file: ScannedFile,
+        scanned_file: IntakeFile,
         output_dir: Path,
     ) -> None:
         """Processing works fine when no audit service is provided."""

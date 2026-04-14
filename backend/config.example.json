@@ -1,5 +1,5 @@
 {
-  "scanner": {
+  "intake": {
     "input_folder": "~/zerobox/inbox",
     "file_types": [".pdf", ".tiff", ".tif", ".png", ".jpg", ".jpeg"]
   },

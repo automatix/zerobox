@@ -27,10 +27,10 @@
 
 | Ticket | Requirement | Description |
 |---|---|---|
-| `T-05` | `FR-01` | Scanner module (read input folder, filter by file type, yield `ScannedFile`) |
+| `T-05` | `FR-01` | Intake module (read input folder, filter by file type, yield `IntakeFile`) |
 | `T-06` | `FR-02` | OCR module (`ocrmypdf` integration, text extraction, `OcrResult` model) |
 
-**Exit criteria:** Place test files in inbox → Scanner picks them up → OCR produces searchable PDFs with extracted text. All actions audit-logged.
+**Exit criteria:** Place test files in inbox → Intake picks them up → OCR produces searchable PDFs with extracted text. All actions audit-logged.
 
 ---
 
@@ -57,7 +57,7 @@
 | Ticket | Requirement | Description |
 |---|---|---|
 | `T-12` | `FR-01` | FileManager module (rename, move, conflict handling, rollback support) |
-| `T-13` | `FR-01` | Pipeline service (orchestrates Scanner → OCR → Classifier → FileManager) |
+| `T-13` | `FR-01` | Pipeline service (orchestrates Intake → OCR → Classifier → FileManager) |
 | `T-14` | `NFR-04` | End-to-end audit trail (every pipeline step logged with rule references) |
 
 **Exit criteria:** `POST /pipeline/run` processes all inbox files through the full pipeline. `POST /proposals/execute` moves approved files. Complete audit trail queryable.
@@ -117,7 +117,7 @@
 ```
 Phase 1 (Foundation)
   │
-  ├──> Phase 2 (Scanner + OCR)
+  ├──> Phase 2 (Intake + OCR)
   │       │
   │       └──> Phase 3 (Classifier + Rules)
   │               │

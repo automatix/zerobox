@@ -1,4 +1,4 @@
-"""Unit tests for the Scanner module (T-05)."""
+"""Unit tests for the Intake module (T-05)."""
 
 from __future__ import annotations
 
@@ -8,29 +8,29 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from zerobox.config import ScannerConfig
-from zerobox.scanner.models import ScannedFile
-from zerobox.scanner.service import ScannerService
+from zerobox.config import IntakeConfig
+from zerobox.intake.models import IntakeFile
+from zerobox.intake.service import IntakeService
 
 
-def _make_config(input_folder: Path, file_types: list[str] | None = None) -> ScannerConfig:
-    """Helper to create a ScannerConfig with a given input folder."""
+def _make_config(input_folder: Path, file_types: list[str] | None = None) -> IntakeConfig:
+    """Helper to create an IntakeConfig with a given input folder."""
     kwargs: dict = {"input_folder": input_folder}
     if file_types is not None:
         kwargs["file_types"] = file_types
-    return ScannerConfig(**kwargs)
+    return IntakeConfig(**kwargs)
 
 
-class TestScannerService:
-    """Tests for ScannerService.scan()."""
+class TestIntakeService:
+    """Tests for IntakeService.scan()."""
 
     def test_scan_matching_files(self, tmp_path: Path) -> None:
-        """Scan returns ScannedFile objects for supported file types."""
+        """Scan returns IntakeFile objects for supported file types."""
         (tmp_path / "doc.pdf").write_bytes(b"%PDF-1.4 fake")
         (tmp_path / "photo.png").write_bytes(b"\x89PNG fake")
 
         config = _make_config(tmp_path)
-        results = ScannerService(config).scan()
+        results = IntakeService(config).scan()
 
         assert len(results) == 2
         names = [r.path.name for r in results]
@@ -44,7 +44,7 @@ class TestScannerService:
         (tmp_path / "notes.txt").write_bytes(b"text content")
 
         config = _make_config(tmp_path)
-        results = ScannerService(config).scan()
+        results = IntakeService(config).scan()
 
         assert len(results) == 1
         assert results[0].path.name == "report.pdf"
@@ -56,14 +56,14 @@ class TestScannerService:
         (tmp_path / "lower.pdf").write_bytes(b"data")
 
         config = _make_config(tmp_path)
-        results = ScannerService(config).scan()
+        results = IntakeService(config).scan()
 
         assert len(results) == 3
 
     def test_scan_empty_folder(self, tmp_path: Path) -> None:
         """An empty folder returns an empty list."""
         config = _make_config(tmp_path)
-        results = ScannerService(config).scan()
+        results = IntakeService(config).scan()
 
         assert results == []
 
@@ -73,7 +73,7 @@ class TestScannerService:
         config = _make_config(missing)
 
         with pytest.raises(FileNotFoundError, match="does not exist"):
-            ScannerService(config).scan()
+            IntakeService(config).scan()
 
     def test_scan_skips_subdirectories(self, tmp_path: Path) -> None:
         """Subdirectories inside the input folder are ignored."""
@@ -83,19 +83,19 @@ class TestScannerService:
         (subdir / "nested.pdf").write_bytes(b"nested pdf")
 
         config = _make_config(tmp_path)
-        results = ScannerService(config).scan()
+        results = IntakeService(config).scan()
 
         assert len(results) == 1
         assert results[0].path.name == "valid.pdf"
 
-    def test_scanned_file_fields_populated(self, tmp_path: Path) -> None:
-        """ScannedFile fields are correctly populated from file metadata."""
+    def test_intake_file_fields_populated(self, tmp_path: Path) -> None:
+        """IntakeFile fields are correctly populated from file metadata."""
         content = b"hello world 12345"
         f = tmp_path / "test.pdf"
         f.write_bytes(content)
 
         config = _make_config(tmp_path)
-        results = ScannerService(config).scan()
+        results = IntakeService(config).scan()
 
         assert len(results) == 1
         sf = results[0]
@@ -111,7 +111,7 @@ class TestScannerService:
         (tmp_path / "bravo.png").write_bytes(b"b")
 
         config = _make_config(tmp_path)
-        results = ScannerService(config).scan()
+        results = IntakeService(config).scan()
 
         names = [r.path.name for r in results]
         assert names == ["alpha.pdf", "bravo.png", "charlie.pdf"]
@@ -123,13 +123,12 @@ class TestScannerService:
 
         audit = MagicMock()
         config = _make_config(tmp_path)
-        results = ScannerService(config, audit=audit).scan()
+        results = IntakeService(config, audit=audit).scan()
 
         assert len(results) == 2
         assert audit.log.call_count == 2
-        # Verify audit was called with correct action
         for call in audit.log.call_args_list:
-            assert call.kwargs["action"] == "scanned"
+            assert call.kwargs["action"] == "intake_discovered"
             assert "size_bytes" in call.kwargs["details"]
             assert "file_type" in call.kwargs["details"]
 
@@ -138,7 +137,7 @@ class TestScannerService:
         (tmp_path / "file.pdf").write_bytes(b"data")
 
         config = _make_config(tmp_path)
-        results = ScannerService(config).scan()
+        results = IntakeService(config).scan()
 
         assert len(results) == 1
 
@@ -148,7 +147,7 @@ class TestScannerService:
         (tmp_path / "doc.pdf").write_bytes(b"pdf")
 
         config = _make_config(tmp_path, file_types=[".bmp"])
-        results = ScannerService(config).scan()
+        results = IntakeService(config).scan()
 
         assert len(results) == 1
         assert results[0].path.name == "image.bmp"

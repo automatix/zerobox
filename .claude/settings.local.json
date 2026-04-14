@@ -40,7 +40,8 @@
       "Bash(python -m pytest tests/unit/test_ocr.py -v)",
       "Bash(pip show:*)",
       "Bash(python -m pytest tests/unit/test_scanner.py tests/unit/test_ocr.py -v)",
-      "Bash(python -m pytest tests/unit/test_scanner.py tests/unit/test_ocr.py tests/unit/test_audit.py -v)"
+      "Bash(python -m pytest tests/unit/test_scanner.py tests/unit/test_ocr.py tests/unit/test_audit.py -v)",
+      "Bash(python -m pytest tests/unit/ -v)"
     ]
   }
 }
