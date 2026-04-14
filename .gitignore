@@ -17,6 +17,14 @@ node_modules/
 dist/
 build/
 out/
+target/
+*.spec
+
+# Tauri sidecar binaries (generated/placeholder)
+frontend/src-tauri/binaries/*.exe
+
+# Tauri generated code
+frontend/src-tauri/gen/
 
 # IDE
 .idea/
