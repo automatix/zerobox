@@ -1,7 +1,7 @@
 # Zerobox — Architecture
 
 > Living document. Updated with every architectural change.
-> Last updated: `2026-04-14`
+> Last updated: `2026-04-15`
 
 ---
 
@@ -23,59 +23,60 @@ The system learns from user corrections through a rule engine backed by JSON pro
 zerobox/
 ├── backend/
 │   ├── pyproject.toml
-│   ├── zerobox/
-│   │   ├── __init__.py
-│   │   ├── app.py                  # FastAPI app factory
-│   │   ├── config.py               # Pydantic settings (all config + defaults)
-│   │   │
-│   │   ├── intake/                 # Module: file discovery
-│   │   │   ├── __init__.py
-│   │   │   ├── service.py
-│   │   │   └── models.py           # IntakeFile
-│   │   │
-│   │   ├── ocr/                    # Module: OCR processing
-│   │   │   ├── __init__.py
-│   │   │   ├── service.py
-│   │   │   └── models.py           # OcrResult
-│   │   │
-│   │   ├── classifier/             # Module: AI-based classification
-│   │   │   ├── __init__.py
-│   │   │   ├── service.py
-│   │   │   ├── models.py           # ClassificationResult, Proposal
-│   │   │   └── providers/          # LLM provider abstraction
-│   │   │       ├── __init__.py     # Provider registry + factory
-│   │   │       ├── base.py         # Abstract LLMProvider interface
-│   │   │       ├── anthropic.py    # Claude implementation
-│   │   │       ├── openai.py       # OpenAI implementation
-│   │   │       └── ollama.py       # Ollama (local) implementation
-│   │   │
-│   │   ├── rules/                  # Module: rule engine
-│   │   │   ├── __init__.py
-│   │   │   ├── service.py
-│   │   │   ├── models.py           # RuleProfile, Rule
-│   │   │   └── schema.json         # JSON Schema for validation
-│   │   │
-│   │   ├── filemanager/            # Module: file operations
-│   │   │   ├── __init__.py
-│   │   │   └── service.py
-│   │   │
-│   │   ├── audit/                  # Module: audit logging
-│   │   │   ├── __init__.py
-│   │   │   ├── service.py
-│   │   │   └── models.py           # AuditEntry
-│   │   │
-│   │   ├── pipeline/               # Module: orchestration
-│   │   │   ├── __init__.py
-│   │   │   └── service.py
-│   │   │
-│   │   └── api/                    # Module: HTTP interface
+│   ├── src/
+│   │   └── zerobox/
 │   │       ├── __init__.py
-│   │       ├── routes/
-│   │       │   ├── pipeline.py     # POST /pipeline/run, GET /pipeline/status
-│   │       │   ├── proposals.py    # GET/PATCH /proposals
-│   │       │   ├── rules.py        # CRUD /rules/profiles
-│   │       │   └── audit.py        # GET /audit/log
-│   │       └── dependencies.py     # FastAPI dependency injection
+│   │       ├── app.py                  # FastAPI app factory
+│   │       ├── config.py               # Pydantic settings (all config + defaults)
+│   │       │
+│   │       ├── intake/                 # Module: file discovery
+│   │       │   ├── __init__.py
+│   │       │   ├── service.py
+│   │       │   └── models.py           # IntakeFile
+│   │       │
+│   │       ├── ocr/                    # Module: OCR processing
+│   │       │   ├── __init__.py
+│   │       │   ├── service.py
+│   │       │   └── models.py           # OcrResult
+│   │       │
+│   │       ├── classifier/             # Module: AI-based classification
+│   │       │   ├── __init__.py
+│   │       │   ├── service.py
+│   │       │   ├── models.py           # ClassificationResult, Proposal
+│   │       │   └── providers/          # LLM provider abstraction
+│   │       │       ├── __init__.py     # Provider registry + factory
+│   │       │       ├── base.py         # Abstract LLMProvider interface
+│   │       │       ├── anthropic.py    # Claude implementation
+│   │       │       ├── openai.py       # OpenAI implementation
+│   │       │       └── ollama.py       # Ollama (local) implementation
+│   │       │
+│   │       ├── rules/                  # Module: rule engine
+│   │       │   ├── __init__.py
+│   │       │   ├── service.py
+│   │       │   ├── models.py           # RuleProfile, Rule
+│   │       │   └── schema.json         # JSON Schema for validation
+│   │       │
+│   │       ├── filemanager/            # Module: file operations
+│   │       │   ├── __init__.py
+│   │       │   └── service.py
+│   │       │
+│   │       ├── audit/                  # Module: audit logging
+│   │       │   ├── __init__.py
+│   │       │   ├── service.py
+│   │       │   └── models.py           # AuditEntry
+│   │       │
+│   │       ├── pipeline/               # Module: orchestration
+│   │       │   ├── __init__.py
+│   │       │   └── service.py
+│   │       │
+│   │       └── api/                    # Module: HTTP interface
+│   │           ├── __init__.py
+│   │           ├── routes/
+│   │           │   ├── pipeline.py     # POST /pipeline/run, GET /pipeline/status
+│   │           │   ├── proposals.py    # GET/PATCH /proposals
+│   │           │   ├── rules.py        # CRUD /rules/profiles
+│   │           │   └── audit.py        # GET /audit/log
+│   │           └── dependencies.py     # FastAPI dependency injection
 │   │
 │   ├── tests/
 │   │   ├── unit/
