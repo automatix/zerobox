@@ -8,7 +8,7 @@ from zerobox.config import AppConfig, load_config
 
 def create_app() -> FastAPI:
     config = load_config()
-    app = FastAPI(title="Zerobox", version="0.1.0")
+    app = FastAPI(title="Zerobox", version="0.0.1")
     app.state.config = config
     app.state.proposals: dict[str, dict] = {}
 
@@ -44,8 +44,9 @@ def create_app() -> FastAPI:
         return config.model_dump(mode="json")
 
     # Include routers
-    from zerobox.api.routes import audit, pipeline, proposals, rules
+    from zerobox.api.routes import audit, pipeline, proposals, rules, setup
 
+    app.include_router(setup.router, prefix="/setup", tags=["setup"])
     app.include_router(pipeline.router, prefix="/pipeline", tags=["pipeline"])
     app.include_router(proposals.router, prefix="/proposals", tags=["proposals"])
     app.include_router(rules.router, prefix="/rules", tags=["rules"])
