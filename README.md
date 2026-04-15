@@ -26,64 +26,18 @@ Modular backend (Python `3.13` + FastAPI) with `9` independent services. The Tau
 
 See [`docs/architecture.md`](docs/architecture.md) for the full architecture document including module interfaces, data models, and dependency injection setup.
 
-## Prerequisites
+---
 
-- **Python** `3.13`+
-- **Tesseract OCR** — required by `ocrmypdf` for text extraction
-- **Ghostscript** — required by `ocrmypdf` for PDF processing
-- **Node.js** `20`+ — for the frontend
-- **Rust toolchain** — for building the Tauri shell (optional if running the backend only)
-- **API key** — Anthropic or OpenAI, unless using a local Ollama instance
+# User Guide
 
-## Quick Start
+## Installation
 
-### Backend
+Download the latest installer from the [Releases](https://github.com/automatix/zerobox/releases) page. Available formats:
 
-```bash
-# Clone the repository
-git clone https://github.com/automatix/zerobox.git
-cd zerobox/backend
+- **MSI** — standard Windows Installer package
+- **NSIS** — executable installer
 
-# Create and activate a virtual environment
-python -m venv .venv
-.venv/Scripts/activate   # Windows
-# source .venv/bin/activate  # Linux/macOS
-
-# Install dependencies
-pip install -e ".[dev]"
-
-# Set up configuration
-cp .env.example .env         # then fill in your API key(s)
-cp config.example.json config.json  # adjust paths if needed
-
-# Start the backend
-uvicorn zerobox.app:create_app --factory --reload
-```
-
-The API server starts at `http://127.0.0.1:8000`.
-
-### Frontend
-
-```bash
-cd zerobox/frontend
-
-# Install dependencies
-npm install
-
-# Start the dev server (Svelte only, without Tauri shell)
-npm run dev
-```
-
-To run the full desktop app with the Tauri shell:
-
-```bash
-# From the frontend/ directory (requires Rust toolchain)
-cargo tauri dev
-```
-
-### API Documentation
-
-With the backend running, visit `http://127.0.0.1:8000/docs` for the interactive Swagger UI.
+The installer bundles the backend, frontend, and all required dependencies.
 
 ## Configuration
 
@@ -109,6 +63,67 @@ ANTHROPIC_API_KEY=sk-ant-...   # if provider = "anthropic"
 OPENAI_API_KEY=sk-...          # if provider = "openai"
 OLLAMA_BASE_URL=http://localhost:11434  # if provider = "ollama"
 ```
+
+---
+
+# Developer Guide
+
+## Prerequisites
+
+- **Python** `3.13`+
+- **Tesseract OCR** — required by `ocrmypdf` for text extraction
+- **Ghostscript** — required by `ocrmypdf` for PDF processing
+- **Node.js** `20`+ — for the frontend
+- **Rust toolchain** — for building the Tauri shell
+- **API key** — Anthropic or OpenAI, unless using a local Ollama instance
+
+## Quick Start
+
+### Backend
+
+```bash
+cd backend
+
+# Create and activate a virtual environment
+python -m venv .venv
+.venv/Scripts/activate   # Windows
+# source .venv/bin/activate  # Linux/macOS
+
+# Install in editable mode (src layout requires installation)
+pip install -e ".[dev]"
+
+# Set up configuration
+cp .env.example .env         # then fill in your API key(s)
+cp config.example.json config.json  # adjust paths if needed
+
+# Start the backend
+uvicorn zerobox.app:create_app --factory --reload
+```
+
+The API server starts at `http://127.0.0.1:8000`.
+
+### Frontend
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start the dev server (Svelte only, without Tauri shell)
+npm run dev
+```
+
+To run the full desktop app with the Tauri shell:
+
+```bash
+# From the frontend/ directory (requires Rust toolchain)
+cargo tauri dev
+```
+
+### API Documentation
+
+With the backend running, visit `http://127.0.0.1:8000/docs` for the interactive Swagger UI.
 
 ## Testing
 
@@ -136,35 +151,28 @@ An importable Postman collection is available at [`docs/postman/zerobox.postman_
 zerobox/
 ├── backend/
 │   ├── pyproject.toml
-│   ├── zerobox/              # Python package
-│   │   ├── app.py            # FastAPI app factory
-│   │   ├── config.py         # Pydantic settings
-│   │   ├── intake/           # File discovery
-│   │   ├── ocr/              # Text extraction (ocrmypdf)
-│   │   ├── classifier/       # AI classification + LLM providers
-│   │   ├── rules/            # JSON rule profiles
-│   │   ├── filemanager/      # Rename + move operations
-│   │   ├── audit/            # SQLite action log
-│   │   ├── pipeline/         # Orchestration
-│   │   └── api/              # FastAPI routes
+│   ├── src/
+│   │   └── zerobox/          # Python package (src layout)
+│   │       ├── app.py        # FastAPI app factory
+│   │       ├── config.py     # Pydantic settings
+│   │       ├── intake/       # File discovery
+│   │       ├── ocr/          # Text extraction (ocrmypdf)
+│   │       ├── classifier/   # AI classification + LLM providers
+│   │       ├── rules/        # JSON rule profiles
+│   │       ├── filemanager/  # Rename + move operations
+│   │       ├── audit/        # SQLite action log
+│   │       ├── pipeline/     # Orchestration
+│   │       └── api/          # FastAPI routes
 │   └── tests/                # Unit + BDD tests
 ├── frontend/
 │   ├── src/                  # Svelte 5 components
 │   ├── src-tauri/            # Tauri Rust shell + sidecar config
 │   └── package.json
 ├── profiles/                 # User rule profiles (JSON)
+├── scripts/                  # Build and installer scripts
 ├── docs/
 │   ├── architecture.md       # Living architecture document
-│   ├── roadmap.md            # Phased roadmap with 29 tickets
 │   └── postman/              # Postman collection
 ├── CLAUDE.md
 └── README.md
 ```
-
-## Roadmap
-
-The project follows a `7`-phase roadmap with `29` tickets tracked as GitHub Issues.
-
-Phases `1` through `6` (Foundation, Intake + OCR, Classifier + Rules, File Operations + Pipeline, API Layer, Frontend) are complete. Phase `7` (Packaging + Polish) is in progress.
-
-See [`docs/roadmap.md`](docs/roadmap.md) for the full plan and ticket details.
