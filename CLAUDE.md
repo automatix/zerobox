@@ -33,3 +33,9 @@ Tickets are tracked as GitHub Issues on `automatix/zerobox` with phase labels (`
 ## Versioning
 
 This project uses Semantic Versioning (`semver.org`). After each commit, evaluate whether a new version release is warranted. Announce version bumps with a brief rationale (patch / minor / major).
+
+When releasing a new version:
+`1.` Update version in all manifests (`backend/pyproject.toml`, `frontend/package.json`, `frontend/src-tauri/Cargo.toml`, `frontend/src-tauri/tauri.conf.json`)
+`2.` Create an annotated Git tag (`git tag -a vX.Y.Z`)
+`3.` Build installers via `scripts/build-installer.ps1`
+`4.` Create a GitHub Release with the installer artifacts (MSI + NSIS) attached
