@@ -92,4 +92,40 @@ export const api = {
 
   // Config
   getConfig: () => fetchJson('/config'),
+
+  // Setup (First-Run-Wizard)
+  getSetupStatus: () => fetchJson<{
+    setup_complete: boolean;
+    has_config: boolean;
+    has_env: boolean;
+    tesseract_available: boolean;
+    tesseract_path: string | null;
+    ghostscript_available: boolean;
+    ghostscript_path: string | null;
+  }>('/setup/status'),
+
+  validateSetup: (body: {
+    provider: string;
+    api_key?: string;
+    ollama_base_url?: string;
+  }) => fetchJson<{
+    provider_ok: boolean;
+    provider_error: string | null;
+    tesseract_ok: boolean;
+    ghostscript_ok: boolean;
+  }>('/setup/validate', { method: 'POST', body: JSON.stringify(body) }),
+
+  saveSetup: (body: {
+    input_folder: string;
+    output_root: string;
+    profiles_dir: string;
+    language?: string;
+    provider?: string;
+    model?: string;
+    api_key?: string;
+    ollama_base_url?: string;
+  }) => fetchJson<{ status: string }>('/setup/save', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  }),
 };
