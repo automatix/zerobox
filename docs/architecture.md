@@ -314,6 +314,9 @@ Tauri launches the Python backend as a **sidecar process**. All communication go
 
 | Method | Path | Purpose |
 |---|---|---|
+| `GET` | `/setup/status` | Check setup completion and dependency status |
+| `POST` | `/setup/validate` | Test LLM provider connection |
+| `POST` | `/setup/save` | Write config.json and .env from wizard |
 | `POST` | `/pipeline/run` | Trigger batch processing |
 | `GET` | `/proposals` | List current proposals |
 | `PATCH` | `/proposals/{id}` | Approve / correct a proposal |
