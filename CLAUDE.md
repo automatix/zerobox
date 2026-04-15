@@ -32,6 +32,8 @@ Tickets are tracked as GitHub Issues on `automatix/zerobox` with phase labels (`
 
 All changes are developed in branches: `feature/<description>`, `bugfix/<description>`, `hotfix/<description>`, `release/<version>`. Merge to `master` when done. Push at least on every ticket close.
 
+Maintain ticket status via labels: `status:ready` (new/backlog), `status:in-progress` (being worked on), `status:done` (complete). Update on every transition.
+
 ## Versioning
 
 This project uses Semantic Versioning (`semver.org`). After each commit, evaluate whether a new version release is warranted. Announce version bumps with a brief rationale (patch / minor / major).
