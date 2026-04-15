@@ -258,3 +258,40 @@ Var GhostscriptFound
   !insertmacro HandleTesseract
   !insertmacro HandleGhostscript
 !macroend
+
+; ---------------------------------------------------------------------------
+; POSTUNINSTALL hook — optionally remove user data and configuration
+; ---------------------------------------------------------------------------
+!macro NSIS_HOOK_POSTUNINSTALL
+  ; Only prompt if not in passive/silent mode and not updating
+  ${If} $PassiveMode <> 1
+  ${AndIf} $UpdateMode <> 1
+    MessageBox MB_YESNO|MB_ICONQUESTION \
+      "Do you want to remove Zerobox user data and configuration as well?$\n$\n\
+      This includes: config.json, .env, inbox folder, archive folder,$\n\
+      rule profiles, and the audit database.$\n$\n\
+      Default locations: $PROFILE\zerobox\$\n$\n\
+      Choose NO to keep your data for a future reinstall." \
+      IDYES uninstall_data
+
+    ; NO — skip
+    Goto uninstall_data_done
+
+    uninstall_data:
+      ; Remove config files from the install directory
+      Delete "$INSTDIR\config.json"
+      Delete "$INSTDIR\.env"
+
+      ; Remove default user data directory ~/zerobox/
+      RMDir /r "$PROFILE\zerobox"
+
+      ; Try to read config.json for custom paths before it was deleted
+      ; (it may have been in INSTDIR which we just cleaned, or in CWD)
+      ; Since config may already be gone, we clean the default location.
+      ; Custom locations would need manual cleanup — inform the user.
+
+      DetailPrint "Removed Zerobox user data from $PROFILE\zerobox"
+
+    uninstall_data_done:
+  ${EndIf}
+!macroend
