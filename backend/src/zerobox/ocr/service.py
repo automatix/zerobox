@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
+import shutil
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -19,6 +22,49 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+def _resolve_app_resources_dir() -> Path | None:
+    """Return the app's resources/ directory (next to the executable in production)."""
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).parent / "resources"
+    return None
+
+
+def _find_tesseract(config_path: Path | None) -> Path | None:
+    """Resolve Tesseract executable: explicit config > portable > system PATH."""
+    if config_path and config_path.exists():
+        return config_path
+
+    res_dir = _resolve_app_resources_dir()
+    if res_dir:
+        portable = res_dir / "tesseract" / "tesseract.exe"
+        if portable.exists():
+            return portable
+
+    system = shutil.which("tesseract")
+    if system:
+        return Path(system)
+
+    return None
+
+
+def _find_ghostscript(config_path: Path | None) -> Path | None:
+    """Resolve Ghostscript executable: explicit config > portable > system PATH."""
+    if config_path and config_path.exists():
+        return config_path
+
+    res_dir = _resolve_app_resources_dir()
+    if res_dir:
+        portable = res_dir / "ghostscript" / "bin" / "gswin64c.exe"
+        if portable.exists():
+            return portable
+
+    system = shutil.which("gswin64c")
+    if system:
+        return Path(system)
+
+    return None
+
+
 class OcrService:
     """Processes scanned files through ocrmypdf to produce searchable PDFs."""
 
@@ -31,6 +77,22 @@ class OcrService:
         self._config = config
         self._output_dir = output_dir
         self._audit = audit
+        self._configure_paths()
+
+    def _configure_paths(self) -> None:
+        """Set environment variables for ocrmypdf to find Tesseract and Ghostscript."""
+        tesseract = _find_tesseract(self._config.tesseract_path)
+        if tesseract:
+            os.environ["TESSERACT_CMD"] = str(tesseract)
+            logger.info("Tesseract path: %s", tesseract)
+
+        ghostscript = _find_ghostscript(self._config.ghostscript_path)
+        if ghostscript:
+            # Ghostscript: add its parent directory to PATH so ocrmypdf can find it
+            gs_dir = str(ghostscript.parent)
+            if gs_dir not in os.environ.get("PATH", ""):
+                os.environ["PATH"] = gs_dir + os.pathsep + os.environ.get("PATH", "")
+            logger.info("Ghostscript path: %s", ghostscript)
 
     def _run_ocr(self, input_path: Path, output_path: Path, sidecar_path: Path) -> int:
         """Run ocrmypdf synchronously and return the exit code."""

@@ -17,6 +17,8 @@ class OcrConfig(BaseModel):
     language: str = "deu+eng"
     deskew: bool = True
     optimize: int = 1
+    tesseract_path: Path | None = None
+    ghostscript_path: Path | None = None
 
 
 class LLMConfig(BaseModel):
