@@ -28,9 +28,9 @@ See [`docs/architecture.md`](docs/architecture.md) for the full architecture doc
 
 ---
 
-# User Guide
+## User Guide
 
-## Installation
+### Installation
 
 Download the latest installer from the [Releases](https://github.com/automatix/zerobox/releases) page. Available formats:
 
@@ -39,9 +39,9 @@ Download the latest installer from the [Releases](https://github.com/automatix/z
 
 The installer bundles the backend, frontend, and all required dependencies.
 
-## Configuration
+### Configuration
 
-### `config.json` — application settings
+#### `config.json` — application settings
 
 Copy `config.example.json` to `config.json` and adjust as needed:
 
@@ -54,7 +54,7 @@ Copy `config.example.json` to `config.json` and adjust as needed:
 | `audit` | `db_path` — SQLite database path |
 | `profiles_dir` | Path to rule profile directory |
 
-### `.env` — secrets
+#### `.env` — secrets
 
 Copy `.env.example` to `.env` and fill in the required keys for your chosen LLM provider:
 
@@ -66,9 +66,9 @@ OLLAMA_BASE_URL=http://localhost:11434  # if provider = "ollama"
 
 ---
 
-# Developer Guide
+## Developer Guide
 
-## Prerequisites
+### Prerequisites
 
 - **Python** `3.13`+
 - **Tesseract OCR** — required by `ocrmypdf` for text extraction
@@ -77,9 +77,9 @@ OLLAMA_BASE_URL=http://localhost:11434  # if provider = "ollama"
 - **Rust toolchain** — for building the Tauri shell
 - **API key** — Anthropic or OpenAI, unless using a local Ollama instance
 
-## Quick Start
+### Quick Start
 
-### Backend
+#### Backend
 
 ```bash
 cd backend
@@ -102,7 +102,7 @@ uvicorn zerobox.app:create_app --factory --reload
 
 The API server starts at `http://127.0.0.1:8000`.
 
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
@@ -121,31 +121,31 @@ To run the full desktop app with the Tauri shell:
 cargo tauri dev
 ```
 
-### API Documentation
+#### API Documentation
 
 With the backend running, visit `http://127.0.0.1:8000/docs` for the interactive Swagger UI.
 
-## Testing
+### Testing
 
 All test commands run from the `backend/` directory.
 
-### Unit Tests
+#### Unit Tests
 
 ```bash
 pytest tests/unit/
 ```
 
-### BDD Tests
+#### BDD Tests
 
 ```bash
 pytest tests/bdd/
 ```
 
-### Postman Collection
+#### Postman Collection
 
 An importable Postman collection is available at [`docs/postman/zerobox.postman_collection.json`](docs/postman/zerobox.postman_collection.json). Import it into Postman to test all API endpoints interactively.
 
-## Project Structure
+### Project Structure
 
 ```
 zerobox/
