@@ -26,7 +26,10 @@
       "Bash(powershell.exe:*)",
       "Bash(reg query:*)",
       "Read(tasks/**)",
-      "Read(//c/**)"
+      "Read(//c/**)",
+      "Bash(pyinstaller:*)",
+      "WebSearch",
+      "WebFetch(domain:v2.tauri.app)"
     ]
   }
 }
