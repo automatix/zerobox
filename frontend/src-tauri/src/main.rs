@@ -8,7 +8,7 @@ fn main() {
             // In production, launch the sidecar.
             #[cfg(not(debug_assertions))]
             {
-                use tauri::Manager;
+                use tauri_plugin_shell::ShellExt;
                 let sidecar = _app.shell()
                     .sidecar("zerobox-backend")
                     .expect("failed to create sidecar command");

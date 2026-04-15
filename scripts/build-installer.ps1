@@ -29,7 +29,7 @@ pyinstaller `
     --name "zerobox-backend-x86_64-pc-windows-msvc" `
     --onefile `
     --noconsole `
-    --add-data "zerobox;zerobox" `
+    --add-data "src/zerobox;zerobox" `
     --hidden-import "uvicorn.logging" `
     --hidden-import "uvicorn.loops" `
     --hidden-import "uvicorn.loops.auto" `
@@ -40,7 +40,7 @@ pyinstaller `
     --hidden-import "uvicorn.protocols.websockets.auto" `
     --hidden-import "uvicorn.lifespan" `
     --hidden-import "uvicorn.lifespan.on" `
-    zerobox/__main__.py
+    src/zerobox/__main__.py
 
 # Copy to Tauri binaries
 if (!(Test-Path $binDir)) { New-Item -ItemType Directory -Path $binDir | Out-Null }
