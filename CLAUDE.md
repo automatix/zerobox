@@ -28,4 +28,8 @@ Backend (Python `3.13` + FastAPI) runs as a Tauri sidecar process, communicating
 
 ## Tickets
 
-Tickets are tracked as GitHub Issues on `automatix/zerobox` with phase labels (`phase:1-foundation` through `phase:7-packaging`). Reference format: `#{number}` (GitHub issue number).
+Tickets are tracked as GitHub Issues on `automatix/zerobox` with phase labels (`phase:1-foundation` through `phase:7-packaging`). Reference format: `#{number}` (GitHub issue number). All changes must go through tickets — create a ticket before implementing.
+
+## Versioning
+
+This project uses Semantic Versioning (`semver.org`). After each commit, evaluate whether a new version release is warranted. Announce version bumps with a brief rationale (patch / minor / major).
