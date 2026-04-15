@@ -48,7 +48,7 @@
     <header class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <h1 class="text-xl font-bold text-gray-900 tracking-tight">Zerobox</h1>
-        <span class="text-xs text-gray-400">v0.1.0</span>
+        <span class="text-xs text-gray-400">v0.1.1</span>
       </div>
     </header>
 

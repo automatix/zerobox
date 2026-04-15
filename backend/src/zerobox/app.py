@@ -8,7 +8,7 @@ from zerobox.config import AppConfig, load_config
 
 def create_app() -> FastAPI:
     config = load_config()
-    app = FastAPI(title="Zerobox", version="0.1.0")
+    app = FastAPI(title="Zerobox", version="0.1.1")
     app.state.config = config
     app.state.proposals: dict[str, dict] = {}
 
