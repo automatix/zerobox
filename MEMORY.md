@@ -164,6 +164,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-17` — `#40`: Move dev-testing.md to docs/
+**Request:** Move `dev-testing.md` to the `docs/` folder and commit & push.
+**Done:** Relocated `dev-testing.md` from `.local/` (gitignored) to `docs/` on branch `feature/move-dev-testing-to-docs`, merged into `master` via `--no-ff`, pushed to `origin`.
+**Result:** `#40` closed with `status:done`. File now tracked as project documentation.
+
 ### `2026-04-14` — `#21`, `#27`: Tauri Sidecar + Windows Installer
 **Request:** Install Rust, close remaining tickets.
 **Done:** Installed Rust `1.94.1` + MSVC Build Tools. `#21`: Tauri `2` Rust project with shell plugin for sidecar management, `cargo check` passes. `#27`: Build scripts (`scripts/build-installer.ps1` + `.sh`) — PyInstaller sidecar + Tauri MSI/NSIS bundler.
