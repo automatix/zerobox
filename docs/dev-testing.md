@@ -12,7 +12,7 @@ pip install -e ".[dev]"
 uvicorn zerobox.app:create_app --factory --reload
 ```
 
-API available at `http://127.0.0.1:8000` (Swagger UI at `/docs`).
+API available at `http://localhost:8000` (Swagger UI at `/docs`).
 
 ### Terminal 2 — Frontend
 
@@ -44,15 +44,15 @@ This starts both the backend sidecar and the Tauri WebView window. In dev mode (
 
 ```bash
 # Check setup status
-curl http://127.0.0.1:8000/setup/status
+curl http://localhost:8000/setup/status
 
 # Validate a provider
-curl -X POST http://127.0.0.1:8000/setup/validate \
+curl -X POST http://localhost:8000/setup/validate \
   -H "Content-Type: application/json" \
   -d '{"provider": "anthropic", "api_key": "sk-ant-..."}'
 
 # Save config via wizard
-curl -X POST http://127.0.0.1:8000/setup/save \
+curl -X POST http://localhost:8000/setup/save \
   -H "Content-Type: application/json" \
   -d '{"input_folder": "~/zerobox/inbox", "output_root": "~/zerobox/archive", "profiles_dir": "~/zerobox/profiles", "provider": "anthropic", "api_key": "sk-ant-..."}'
 ```

@@ -100,7 +100,7 @@ cp config.example.json config.json  # adjust paths if needed
 uvicorn zerobox.app:create_app --factory --reload
 ```
 
-The API server starts at `http://127.0.0.1:8000`.
+The API server starts at `http://localhost:8000`.
 
 #### Frontend
 
@@ -123,7 +123,7 @@ cargo tauri dev
 
 #### API Documentation
 
-With the backend running, visit `http://127.0.0.1:8000/docs` for the interactive Swagger UI.
+With the backend running, visit `http://localhost:8000/docs` for the interactive Swagger UI.
 
 ### Testing
 
