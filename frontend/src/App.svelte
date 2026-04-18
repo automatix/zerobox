@@ -18,14 +18,15 @@
 
   let activeTab: Tab = $state('review');
   let setupComplete: boolean | null = $state(null); // null = loading
+  let setupError: string | null = $state(null);
 
   async function checkSetup() {
+    setupError = null;
     try {
       const status = await api.getSetupStatus();
       setupComplete = status.setup_complete;
-    } catch {
-      // If backend is not reachable, skip wizard and show app
-      setupComplete = true;
+    } catch (err) {
+      setupError = err instanceof Error ? err.message : String(err);
     }
   }
 
@@ -34,7 +35,25 @@
   });
 </script>
 
-{#if setupComplete === null}
+{#if setupError !== null}
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div class="max-w-md w-full bg-white border border-red-200 rounded-lg p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-red-700 mb-2">Backend unreachable</h2>
+      <p class="text-sm text-gray-700 mb-4">
+        Could not load setup status from the backend. Please verify the backend is running
+        at <code class="bg-gray-100 px-1 rounded">http://localhost:8000</code>.
+      </p>
+      <p class="text-xs text-gray-500 mb-4">Details: {setupError}</p>
+      <button
+        onclick={() => { setupComplete = null; checkSetup(); }}
+        class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded hover:bg-indigo-700"
+      >
+        Retry
+      </button>
+    </div>
+    <ToastContainer />
+  </div>
+{:else if setupComplete === null}
   <!-- Loading -->
   <div class="min-h-screen bg-gray-50 flex items-center justify-center">
     <p class="text-gray-500 text-sm">Loading...</p>
