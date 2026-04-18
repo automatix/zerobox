@@ -17,7 +17,7 @@
   let provider: 'anthropic' | 'openai' | 'ollama' = $state('anthropic');
   let apiKey = $state('');
   let ollamaUrl = $state('http://localhost:11434');
-  let model = $state('claude-sonnet-4-20250514');
+  let model = $state('claude-sonnet-4-6');
 
   // Folders step
   let inputFolder = $state('');
@@ -38,7 +38,7 @@
   });
 
   const providerModels: Record<string, { label: string; defaultModel: string }> = {
-    anthropic: { label: 'Anthropic (Claude)', defaultModel: 'claude-sonnet-4-20250514' },
+    anthropic: { label: 'Anthropic (Claude)', defaultModel: 'claude-sonnet-4-6' },
     openai: { label: 'OpenAI (GPT)', defaultModel: 'gpt-4o' },
     ollama: { label: 'Ollama (Local)', defaultModel: 'llama3' },
   };
