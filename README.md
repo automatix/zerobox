@@ -64,6 +64,34 @@ OPENAI_API_KEY=sk-...          # if provider = "openai"
 OLLAMA_BASE_URL=http://localhost:11434  # if provider = "ollama"
 ```
 
+#### Finding valid model names
+
+The First-Run-Wizard and the `llm.model` setting in `config.json` expect an exact model identifier. Each provider publishes its own catalog:
+
+**Anthropic (Claude)**
+- Docs: `https://docs.claude.com/en/docs/about-claude/models`
+- API:
+  ```bash
+  curl https://api.anthropic.com/v1/models \
+    -H "x-api-key: $ANTHROPIC_API_KEY" \
+    -H "anthropic-version: 2023-06-01"
+  ```
+
+**OpenAI (GPT)**
+- Docs: `https://platform.openai.com/docs/models`
+- API:
+  ```bash
+  curl https://api.openai.com/v1/models \
+    -H "Authorization: Bearer $OPENAI_API_KEY"
+  ```
+
+**Ollama (local)**
+- CLI: `ollama list` (shows pulled models), `ollama pull <name>` to fetch a new one.
+- API:
+  ```bash
+  curl http://localhost:11434/api/tags
+  ```
+
 ---
 
 ## Developer Guide
