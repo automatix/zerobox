@@ -164,6 +164,16 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-18` — `#43`: Backend CORS + frontend error surfacing
+**Request:** Fix First-Run-Wizard not appearing despite missing `config.json`.
+**Done:** Root cause was missing CORS middleware — `http://localhost:5173` → `http://localhost:8000` is cross-origin, so the browser blocked `/setup/status` and the frontend's silent catch in `App.svelte` hid the failure behind the main UI. Added `CORSMiddleware` in `app.py` with allow-list for Vite dev (`localhost:5173`, `127.0.0.1:5173`) and Tauri WebView (`tauri://localhost`, `http://tauri.localhost`). Removed the silent fallback in `App.svelte`; unreachable backend now renders an explicit error state with a Retry button. `9` new CORS unit tests, `178` unit tests green total.
+**Result:** `#43` closed via PR `#44`. Wizard appears again on fresh installs; backend outages are now visible.
+
+### `2026-04-18` — `#41`: Unify client URLs to `localhost`
+**Request:** Harmonize mixed usage of `127.0.0.1` and `localhost` in client-facing URLs.
+**Done:** Replaced `127.0.0.1` → `localhost` in `README.md`, `docs/dev-testing.md`, `docs/postman/local.postman_environment.json`, `frontend/src/lib/api.ts`. Server bind host in `backend/src/zerobox/__main__.py` intentionally kept as `127.0.0.1` (IPv4 loopback bind address, semantically distinct from a client URL).
+**Result:** `#41` closed via PR `#42`.
+
 ### `2026-04-17` — `#40`: Move dev-testing.md to docs/
 **Request:** Move `dev-testing.md` to the `docs/` folder and commit & push.
 **Done:** Relocated `dev-testing.md` from `.local/` (gitignored) to `docs/` on branch `feature/move-dev-testing-to-docs`, merged into `master` via `--no-ff`, pushed to `origin`.
