@@ -1,9 +1,17 @@
 """FastAPI app factory."""
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from zerobox.config import AppConfig, load_config
+
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "tauri://localhost",
+    "http://tauri.localhost",
+]
 
 
 def create_app() -> FastAPI:
@@ -11,6 +19,14 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Zerobox", version="0.1.1")
     app.state.config = config
     app.state.proposals: dict[str, dict] = {}
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=ALLOWED_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     # ------------------------------------------------------------------
     # Global exception handlers
