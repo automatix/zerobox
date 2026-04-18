@@ -18,7 +18,7 @@ from zerobox.rules.models import Rule
 # ---------------------------------------------------------------------------
 
 def _make_config(**overrides) -> LLMConfig:
-    defaults = {"provider": "anthropic", "model": "claude-sonnet-4-20250514", "temperature": 0.0}
+    defaults = {"provider": "anthropic", "model": "claude-sonnet-4-6", "temperature": 0.0}
     defaults.update(overrides)
     return LLMConfig(**defaults)
 

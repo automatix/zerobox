@@ -51,7 +51,7 @@ class SaveConfigRequest(BaseModel):
     profiles_dir: str
     language: str = "deu+eng"
     provider: Literal["anthropic", "openai", "ollama"] = "anthropic"
-    model: str = "claude-sonnet-4-20250514"
+    model: str = "claude-sonnet-4-6"
     api_key: str = ""
     ollama_base_url: str = "http://localhost:11434"
 
