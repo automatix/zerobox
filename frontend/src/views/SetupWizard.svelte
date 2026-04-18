@@ -27,6 +27,42 @@
   // OCR step
   let language = $state('deu+eng');
 
+  // OCR dependency status (fetched on entering the OCR step, refetchable on demand)
+  type DepStatus = {
+    tesseract_available: boolean;
+    tesseract_path: string | null;
+    ghostscript_available: boolean;
+    ghostscript_path: string | null;
+  };
+  let depStatus: DepStatus | null = $state(null);
+  let depLoading = $state(false);
+  let depError: string | null = $state(null);
+
+  const ocrRequirementsMet = $derived(
+    depStatus !== null &&
+      depStatus.tesseract_available &&
+      depStatus.ghostscript_available,
+  );
+  const nextDisabled = $derived(step === 'ocr' && !ocrRequirementsMet);
+
+  async function checkDependencies() {
+    depLoading = true;
+    depError = null;
+    try {
+      const status = await api.getSetupStatus();
+      depStatus = {
+        tesseract_available: status.tesseract_available,
+        tesseract_path: status.tesseract_path,
+        ghostscript_available: status.ghostscript_available,
+        ghostscript_path: status.ghostscript_path,
+      };
+    } catch (err) {
+      depError = err instanceof Error ? err.message : String(err);
+    } finally {
+      depLoading = false;
+    }
+  }
+
   // Set sensible defaults for folders
   $effect(() => {
     if (!inputFolder) {
@@ -34,6 +70,13 @@
       inputFolder = '~/zerobox/inbox';
       outputRoot = '~/zerobox/archive';
       profilesDir = '~/zerobox/profiles';
+    }
+  });
+
+  // Auto-check OCR dependencies when the user first enters the OCR step
+  $effect(() => {
+    if (step === 'ocr' && depStatus === null && !depLoading && depError === null) {
+      checkDependencies();
     }
   });
 
@@ -263,38 +306,51 @@
             </p>
           </div>
 
-          <!-- Dependency status (fetched on mount) -->
-          {#await api.getSetupStatus()}
-            <p class="text-sm text-gray-500">Checking dependencies...</p>
-          {:then status}
-            <div class="space-y-2 pt-2">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full {status.tesseract_available ? 'bg-green-500' : 'bg-red-500'}"></span>
-                <span class="text-sm text-gray-700">
-                  Tesseract OCR: {status.tesseract_available ? 'Found' : 'Not found'}
-                </span>
-                {#if status.tesseract_path}
-                  <span class="text-xs text-gray-400 font-mono">{status.tesseract_path}</span>
-                {/if}
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full {status.ghostscript_available ? 'bg-green-500' : 'bg-red-500'}"></span>
-                <span class="text-sm text-gray-700">
-                  Ghostscript: {status.ghostscript_available ? 'Found' : 'Not found'}
-                </span>
-                {#if status.ghostscript_path}
-                  <span class="text-xs text-gray-400 font-mono">{status.ghostscript_path}</span>
-                {/if}
-              </div>
-              {#if !status.tesseract_available || !status.ghostscript_available}
-                <p class="text-xs text-amber-600 mt-2">
-                  OCR is required for Zerobox to process scans. Please install the missing dependencies before continuing — see the Prerequisites section in README.md for setup instructions.
-                </p>
-              {/if}
+          <!-- Dependency status (auto-fetched on OCR step entry; user can re-check) -->
+          <div class="pt-2 space-y-2">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-medium text-gray-700">OCR Requirements</h3>
+              <button
+                onclick={checkDependencies}
+                disabled={depLoading}
+                class="text-xs text-indigo-600 hover:text-indigo-800 disabled:text-gray-400"
+              >
+                {depLoading ? 'Checking...' : 'Check requirements'}
+              </button>
             </div>
-          {:catch}
-            <p class="text-sm text-red-600">Could not check dependencies</p>
-          {/await}
+
+            {#if depLoading && depStatus === null}
+              <p class="text-sm text-gray-500">Checking dependencies...</p>
+            {:else if depError}
+              <p class="text-sm text-red-600">Could not check dependencies: {depError}</p>
+            {:else if depStatus}
+              <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full {depStatus.tesseract_available ? 'bg-green-500' : 'bg-red-500'}"></span>
+                  <span class="text-sm text-gray-700">
+                    Tesseract OCR: {depStatus.tesseract_available ? 'Found' : 'Not found'}
+                  </span>
+                  {#if depStatus.tesseract_path}
+                    <span class="text-xs text-gray-400 font-mono">{depStatus.tesseract_path}</span>
+                  {/if}
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full {depStatus.ghostscript_available ? 'bg-green-500' : 'bg-red-500'}"></span>
+                  <span class="text-sm text-gray-700">
+                    Ghostscript: {depStatus.ghostscript_available ? 'Found' : 'Not found'}
+                  </span>
+                  {#if depStatus.ghostscript_path}
+                    <span class="text-xs text-gray-400 font-mono">{depStatus.ghostscript_path}</span>
+                  {/if}
+                </div>
+                {#if !ocrRequirementsMet}
+                  <p class="text-xs text-amber-600 mt-2">
+                    OCR is required for Zerobox to process scans. Please install the missing dependencies and click "Check requirements" to re-verify — see the Prerequisites section in README.md for setup instructions.
+                  </p>
+                {/if}
+              </div>
+            {/if}
+          </div>
         </div>
 
       <!-- Step 4: Summary -->
@@ -352,12 +408,19 @@
           {saving ? 'Saving...' : 'Finish Setup'}
         </button>
       {:else}
-        <button
-          onclick={next}
-          class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-        >
-          Next
-        </button>
+        <div class="flex flex-col items-end gap-1">
+          <button
+            onclick={next}
+            disabled={nextDisabled}
+            title={nextDisabled ? 'Install the missing OCR dependencies to continue.' : ''}
+            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+          {#if nextDisabled}
+            <span class="text-xs text-amber-600">Install the missing OCR dependencies to continue.</span>
+          {/if}
+        </div>
       {/if}
     </div>
   </div>
