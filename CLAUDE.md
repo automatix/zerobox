@@ -34,6 +34,10 @@ All changes are developed in branches: `feature/<description>`, `bugfix/<descrip
 
 Maintain ticket status via labels: `status:ready` (new/backlog), `status:in-progress` (being worked on), `status:done` (complete). Update on every transition.
 
+## Interaction
+
+When the user gives a directive that references multiple items and mentions parallelism (e.g. `"Mach beides. Gerne parallel."`, `"Löse beides"`, `"X, gerne parallel"`), the default is to **implement** them, not just to create tickets. Only file a ticket without implementing when the user explicitly says `"nur anlegen"` / `"nur ticketen"` / similar, or when an architectural decision requires user input — in which case ask before silently deferring.
+
 ## Versioning
 
 This project uses Semantic Versioning (`semver.org`). After each commit, evaluate whether a new version release is warranted. Announce version bumps with a brief rationale (patch / minor / major).
