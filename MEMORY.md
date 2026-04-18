@@ -168,6 +168,16 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-18` — `#56`: Codify "implement, don't just file" interaction rule
+**Request:** Remember the lesson that `"Mach beides. Gerne parallel."` defaults to implementation, both at project and global scope.
+**Done:** Added an `Interaction` section to the project `CLAUDE.md`. Mirrored the rule in the user's global `CLAUDE.md` and added a `feedback_implement_when_parallel.md` entry to the session auto-memory (both outside this repo).
+**Result:** `#56` closed via PR `#58`.
+
+### `2026-04-18` — `#52`: Document dev-vs-installer context detection options (docs only)
+**Request:** Capture the architectural considerations around detecting dev vs. installer runtime context in docs and in the ticket; implementation deferred.
+**Done:** Extended the body of issue `#52` with three candidate approaches (backend signal via `/setup/status`, Tauri compile-time flag, bundled-binary heuristic) incl. trade-offs and current leaning (Option `1`). Added a new `Open Architecture Questions` section to `docs/architecture.md` mirroring the decision matrix. Ticket `#52` stays open (`status:ready`) pending the final decision after user-testing feedback on `#51`.
+**Result:** Docs landed via PR `#57`. Implementation of `#52` deferred per user request.
+
 ### `2026-04-18` — `#53`: Restructure `dev-testing.md`
 **Request:** The "Full desktop mode", "Testing endpoints", and "Resetting the wizard" subsections were nested under "Running Zerobox in Dev Mode" and read as continuation steps, not alternatives. Fix the structure.
 **Done:** Promoted the three misplaced `###` subsections to top-level `##` sections in `docs/dev-testing.md`. Heading-level change only, content untouched. Implemented via background agent in an isolated worktree.
