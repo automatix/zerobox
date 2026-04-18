@@ -166,6 +166,16 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-18` — `#48`: Update default Claude model to `claude-sonnet-4-6`
+**Request:** Replace the stale hardcoded default Claude model (`claude-sonnet-4-20250514`) with the current Sonnet identifier.
+**Done:** Updated defaults to `claude-sonnet-4-6` in `SetupWizard.svelte` (initial state + `providerModels.anthropic.defaultModel`), `backend/src/zerobox/config.py`, `backend/src/zerobox/api/routes/setup.py`, `backend/config.example.json`, `backend/tests/unit/test_anthropic_provider.py` (default fixture only), and `docs/architecture.md`. OpenAI (`gpt-4o`) and Ollama (`llama3`) defaults unchanged.
+**Result:** `#48` closed via PR `#50`. `178` unit tests green.
+
+### `2026-04-18` — `#47`: Document how to discover valid LLM model names
+**Request:** Add examples to the docs explaining how to find valid model identifiers per LLM provider.
+**Done:** New "Finding valid model names" subsection in `README.md` under Configuration with doc URLs and concrete curl/CLI examples for Anthropic, OpenAI, and Ollama.
+**Result:** `#47` closed via PR `#49`.
+
 ### `2026-04-18` — `#45`: Sync frontend package-lock.json to `0.1.1`
 **Request:** Resolve the remaining stash or discard it — ensure the stash list is empty.
 **Done:** Stash contained a legitimate version drift fix (`package-lock.json` at `0.0.1` while `package.json` at `0.1.1`). Opened `#45`, branch `chore/sync-package-lock-version`, applied the two-line sync, merged via PR `#46`.
