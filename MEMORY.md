@@ -164,6 +164,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-18` — `#45`: Sync frontend package-lock.json to `0.1.1`
+**Request:** Resolve the remaining stash or discard it — ensure the stash list is empty.
+**Done:** Stash contained a legitimate version drift fix (`package-lock.json` at `0.0.1` while `package.json` at `0.1.1`). Opened `#45`, branch `chore/sync-package-lock-version`, applied the two-line sync, merged via PR `#46`.
+**Result:** `#45` closed. Stash list empty.
+
 ### `2026-04-18` — `#43`: Backend CORS + frontend error surfacing
 **Request:** Fix First-Run-Wizard not appearing despite missing `config.json`.
 **Done:** Root cause was missing CORS middleware — `http://localhost:5173` → `http://localhost:8000` is cross-origin, so the browser blocked `/setup/status` and the frontend's silent catch in `App.svelte` hid the failure behind the main UI. Added `CORSMiddleware` in `app.py` with allow-list for Vite dev (`localhost:5173`, `127.0.0.1:5173`) and Tauri WebView (`tauri://localhost`, `http://tauri.localhost`). Removed the silent fallback in `App.svelte`; unreachable backend now renders an explicit error state with a Retry button. `9` new CORS unit tests, `178` unit tests green total.
