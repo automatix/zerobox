@@ -288,7 +288,7 @@
               </div>
               {#if !status.tesseract_available || !status.ghostscript_available}
                 <p class="text-xs text-amber-600 mt-2">
-                  Missing dependencies can still be installed later. The app will work for non-OCR features.
+                  OCR is required for Zerobox to process scans. Please install the missing dependencies before continuing — see the Prerequisites section in README.md for setup instructions.
                 </p>
               {/if}
             </div>
