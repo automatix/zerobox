@@ -168,6 +168,16 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-18` — `#53`: Restructure `dev-testing.md`
+**Request:** The "Full desktop mode", "Testing endpoints", and "Resetting the wizard" subsections were nested under "Running Zerobox in Dev Mode" and read as continuation steps, not alternatives. Fix the structure.
+**Done:** Promoted the three misplaced `###` subsections to top-level `##` sections in `docs/dev-testing.md`. Heading-level change only, content untouched. Implemented via background agent in an isolated worktree.
+**Result:** `#53` closed via PR `#54`.
+
+### `2026-04-18` — `#51`: Correct misleading OCR dependency message
+**Request:** The wizard's OCR step showed "Missing dependencies can still be installed later. The app will work for non-OCR features." — factually wrong (OCR is `FR-02`, core) and contradicts `DD-06` (installer bundles deps). Short-term copy fix.
+**Done:** Replaced the text in `SetupWizard.svelte:289-293` with a clear warning that OCR is required and pointing to the `Prerequisites` section in `README.md`. Amber styling preserved. Implemented via background agent in an isolated worktree; frontend build verified. Broader dev-vs-installer context handling tracked separately as `#52`.
+**Result:** `#51` closed via PR `#55`.
+
 ### `2026-04-18` — `#48`: Update default Claude model to `claude-sonnet-4-6`
 **Request:** Replace the stale hardcoded default Claude model (`claude-sonnet-4-20250514`) with the current Sonnet identifier.
 **Done:** Updated defaults to `claude-sonnet-4-6` in `SetupWizard.svelte` (initial state + `providerModels.anthropic.defaultModel`), `backend/src/zerobox/config.py`, `backend/src/zerobox/api/routes/setup.py`, `backend/config.example.json`, `backend/tests/unit/test_anthropic_provider.py` (default fixture only), and `docs/architecture.md`. OpenAI (`gpt-4o`) and Ollama (`llama3`) defaults unchanged.
