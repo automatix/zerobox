@@ -168,6 +168,16 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-18` — `#62`: Bump version to `0.2.0` + GitHub Release
+**Request:** Align/catch up versioning across all manifests after the session's accumulated work.
+**Done:** Minor bump `0.1.1` → `0.2.0` in `backend/pyproject.toml`, `backend/src/zerobox/app.py` (FastAPI title), `frontend/package.json` + `package-lock.json`, `frontend/src-tauri/{Cargo.toml, Cargo.lock, tauri.conf.json}`, and the `App.svelte` header display. Annotated tag `v0.2.0` created and pushed. GitHub Release published with collated highlights. Installer artifacts not attached — can be built locally via `scripts/build-installer.ps1` and uploaded later.
+**Result:** `#62` closed via PR `#64`. Release: https://github.com/automatix/zerobox/releases/tag/v0.2.0
+
+### `2026-04-18` — `#61`: Gitignore `docs/keys.md` and `.claude/worktrees/*`
+**Request:** Protect accidental commit of the real API key in `docs/keys.md` and stop tracking background-agent worktree contents.
+**Done:** Added both patterns to `.gitignore`; verified via `git check-ignore -v`. Existing `.local/*` pattern served as the template.
+**Result:** `#61` closed via PR `#63`.
+
 ### `2026-04-18` — `#59`: Gate Wizard OCR step on requirement status
 **Request:** In the Wizard's OCR step, list all requirements with red/green dots, add a `Check requirements` button, and disable the `Next` button until all requirements are satisfied.
 **Done:** `SetupWizard.svelte` — promoted OCR dependency status from a one-shot `{#await}` to reactive state (`depStatus`, `depLoading`, `depError`); added a `Check requirements` button that re-fetches `/setup/status`; added derived `ocrRequirementsMet` and `nextDisabled` flags that disable `Next` on the OCR step until Tesseract **and** Ghostscript are found, with amber helper text and tooltip explaining why. Auto-check on first entry to the OCR step. Frontend build green.
