@@ -160,6 +160,7 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 - `IDEA-06` — **Preview pane** — show a thumbnail/preview of the scanned document alongside the classification result in the review table.
 - `IDEA-07` — **Test coverage tooling** — add `pytest-cov` to dev dependencies and configure coverage reporting.
 - `IDEA-08` — **User-defined LLM providers** — allow users to register a custom provider entry in the First-Run-Wizard / Settings (name, base URL, model, auth scheme) instead of picking from the fixed list (`anthropic`, `openai`, `ollama`). Useful for OpenAI-compatible gateways (Azure OpenAI, LiteLLM, LocalAI, Groq, self-hosted vLLM, etc.).
+- `IDEA-09` — **Model picker assistance** — replace the free-text model field in the First-Run-Wizard / Settings with guided input: live-fetch available models from the selected provider (Anthropic `/v1/models`, OpenAI `/v1/models`, Ollama `/api/tags`) as a dropdown/autocomplete, fall back to a curated list of known models per provider if the API is unreachable, and surface metadata (context window, approximate cost, capability tags). Also warn when the stored default has been deprecated/retired.
 
 ---
 
