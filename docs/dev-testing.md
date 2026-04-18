@@ -31,7 +31,7 @@ Open `http://localhost:5173` in the browser.
 - After completing the wizard, `config.json` and `.env` are written to the backend working directory.
 - Subsequent launches skip the wizard and show the main app (Review, Rule Profiles, Audit Log, Settings).
 
-### Full desktop mode (Tauri shell)
+## Full desktop mode (Tauri shell)
 
 ```bash
 cd frontend
@@ -40,7 +40,7 @@ cargo tauri dev
 
 This starts both the backend sidecar and the Tauri WebView window. In dev mode (`debug_assertions`), the backend is **not** auto-started by Tauri — you must run it manually in Terminal 1.
 
-### Testing the setup endpoints directly
+## Testing the setup endpoints directly
 
 ```bash
 # Check setup status
@@ -57,6 +57,6 @@ curl -X POST http://localhost:8000/setup/save \
   -d '{"input_folder": "~/zerobox/inbox", "output_root": "~/zerobox/archive", "profiles_dir": "~/zerobox/profiles", "provider": "anthropic", "api_key": "sk-ant-..."}'
 ```
 
-### Resetting the wizard
+## Resetting the wizard
 
 Delete `config.json` in the backend directory to trigger the wizard again on next page load.
