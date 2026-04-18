@@ -341,3 +341,19 @@ Tauri launches the Python backend as a **sidecar process**. All communication go
 | Desktop shell | Tauri | `2` |
 | UI framework | Svelte | `5` |
 | CSS | Tailwind CSS | `4` |
+
+---
+
+## Open Architecture Questions
+
+### Dev vs installer runtime context (`#52`)
+
+The First-Run-Wizard's OCR-dependency step currently treats dev-mode (user runs from source) and installer-mode (bundled app) identically, which contradicts `DD-06` — the installer bundles Tesseract and Ghostscript, so they should never be missing on an installed build. To differentiate the two contexts, three options are under consideration:
+
+| Option | Mechanism | Pros | Cons |
+|---|---|---|---|
+| `1` Backend signal | `/setup/status` returns `run_mode: "dev" \| "installer"`, derived from an env var set by the Tauri launcher | Runtime-accurate; no frontend coupling to Tauri internals; single source of truth | Backend + frontend change; launcher must set the env var |
+| `2` Tauri compile-time flag | Expose `debug_assertions` (or a custom Cargo feature) via `@tauri-apps/api` | Frontend-only, no backend change | Only works inside the Tauri shell; conflates "debug build" with "dev mode" |
+| `3` Bundled-binary heuristic | Check for a bundled tool path under the Tauri resources directory | No extra plumbing | Fragile; couples detection to bundling layout |
+
+**Current leaning:** Option `1`. Final decision tracked in issue `#52`; revisit after user-testing feedback on the short-term wording fix (`#51`).
