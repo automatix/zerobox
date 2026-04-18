@@ -168,6 +168,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-18` — `#59`: Gate Wizard OCR step on requirement status
+**Request:** In the Wizard's OCR step, list all requirements with red/green dots, add a `Check requirements` button, and disable the `Next` button until all requirements are satisfied.
+**Done:** `SetupWizard.svelte` — promoted OCR dependency status from a one-shot `{#await}` to reactive state (`depStatus`, `depLoading`, `depError`); added a `Check requirements` button that re-fetches `/setup/status`; added derived `ocrRequirementsMet` and `nextDisabled` flags that disable `Next` on the OCR step until Tesseract **and** Ghostscript are found, with amber helper text and tooltip explaining why. Auto-check on first entry to the OCR step. Frontend build green.
+**Result:** `#59` closed via PR `#60`.
+
 ### `2026-04-18` — `#56`: Codify "implement, don't just file" interaction rule
 **Request:** Remember the lesson that `"Mach beides. Gerne parallel."` defaults to implementation, both at project and global scope.
 **Done:** Added an `Interaction` section to the project `CLAUDE.md`. Mirrored the rule in the user's global `CLAUDE.md` and added a `feedback_implement_when_parallel.md` entry to the session auto-memory (both outside this repo).
