@@ -30,6 +30,12 @@ frontend/src-tauri/gen/
 .local/*
 !.local/.gitkeep
 
+# Secrets drop (never commit)
+docs/keys.md
+
+# Background-agent worktrees (contents ignored, folder allowed)
+.claude/worktrees/*
+
 # IDE
 .idea/
 .vscode/
