@@ -61,6 +61,20 @@ curl -X POST http://localhost:8000/setup/save \
 
 Delete `config.json` from the per-user config directory (see above) to trigger the wizard again on next page load. For selective or scripted resets, prefer the dev-uninstall CLI below.
 
+## Docs Bundle (release artifact)
+
+Part of the release process: `scripts/build-docs-bundle.(ps1|sh)` creates `docs.zip` in the repo root containing the end-user docs (`README.md`, `docs/user-guide.md`) plus the technical/dev docs (`docs/architecture.md`, `docs/dev-testing.md`, `docs/roadmap.md`, `docs/postman/`). The zip is attached to the GitHub Release alongside the MSI/NSIS installers so downstream users have offline documentation without cloning the repo.
+
+```powershell
+scripts/build-docs-bundle.ps1
+```
+
+```bash
+scripts/build-docs-bundle.sh
+```
+
+`docs.zip` and the transient `.docs-bundle-staging/` directory are git-ignored.
+
 ## Dev-Uninstall / Reset
 
 Wipe zerobox state selectively to retest the First-Run-Wizard or pipeline from a clean slate. Reads the current `config.json` (if present) so user-configured paths are honoured.
