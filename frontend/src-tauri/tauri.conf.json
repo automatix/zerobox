@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicklimmern/tauri-v2/main/tooling/cli/schema.json",
   "productName": "zerobox",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "identifier": "com.zerobox.app",
   "build": {
     "frontendDist": "../dist",
