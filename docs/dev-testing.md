@@ -7,12 +7,35 @@ System-level tools that must be installed before running zerobox from source (no
 | Tool | Version | Purpose |
 |---|---|---|
 | Python | `3.13`+ | Backend runtime |
-| Node.js | `20`+ | Frontend build + dev server |
+| Node.js | `20`+ (pinned via `frontend/.nvmrc`) | Frontend build + dev server |
+| npm | `10.9.2` (pinned via `frontend/package.json` → `packageManager`) | Frontend package manager |
 | Rust toolchain | stable | Building the Tauri shell (only needed for `cargo tauri dev` / installer builds) |
 | Tesseract OCR | `5`+ | Text extraction (invoked by `ocrmypdf`) |
 | Ghostscript | `10`+ | PDF processing (invoked by `ocrmypdf`) |
 
 All Python packages — including `uvicorn`, `fastapi`, `ocrmypdf`, `anthropic`, `openai`, `pytest`, `ruff` — are installed automatically by `pip install -e ".[dev]"` and do **not** need to be installed separately. The same applies to the installed end-user build: the Windows installer (MSI/NSIS) bundles the backend (including `uvicorn`) as a standalone PyInstaller executable, so end users only need Tesseract and Ghostscript on their system.
+
+### Node.js and npm version pinning
+
+To prevent `frontend/package-lock.json` drift across dev machines, the Node.js + npm versions are pinned canonically:
+
+- `frontend/.nvmrc` — Node major-version alias. Run `nvm use` inside `frontend/` to switch to a matching Node line (installs on demand with `nvm install`).
+- `frontend/package.json` → `"packageManager": "npm@10.9.2"` — Corepack reads this and transparently downloads + invokes that exact npm version whenever you run `npm …` from the frontend directory.
+- `frontend/package.json` → `"engines": { "node": ">=20.0.0", "npm": ">=10.0.0" }` — soft guard; npm emits a warning if your runtime is below the floor.
+
+Enable Corepack once per machine (ships with most Node distributions, but you have to activate it):
+
+```bash
+corepack enable
+```
+
+If `corepack: command not found` (some newer Node builds omit it), install it standalone:
+
+```bash
+npm install -g corepack && corepack enable
+```
+
+From then on, `cd frontend && npm install` uses the pinned npm automatically — even if your system npm is a different version. Without Corepack active the pin is advisory only: `npm` / `engines` warnings will fire, but the installed npm on `PATH` is what actually runs, and it may re-write `frontend/package-lock.json` into whatever format *that* npm version prefers.
 
 ## Running Zerobox in Dev Mode (without installer)
 
@@ -64,7 +87,8 @@ Your prompt should change to show `(.venv)` once active. Run `deactivate` to lea
 
 ```bash
 cd frontend
-npm install
+nvm use                # picks the Node line from frontend/.nvmrc (skip if you use another version manager)
+npm install            # uses the npm version pinned via packageManager (requires corepack enable, see Prerequisites)
 ```
 
 **Every session:**
