@@ -9,6 +9,7 @@ from unittest.mock import patch
 import pytest
 from fastapi.testclient import TestClient
 
+from zerobox.api.routes.setup import _find_executable
 from zerobox.app import create_app
 
 
@@ -18,6 +19,64 @@ def client(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     app = create_app()
     return TestClient(app)
+
+
+class TestFindExecutable:
+    def test_returns_path_hit_when_on_path(self, monkeypatch):
+        monkeypatch.setattr(
+            "zerobox.api.routes.setup.shutil.which",
+            lambda _: r"C:\some\path\tesseract.exe",
+        )
+        result = _find_executable("tesseract")
+        assert result == r"C:\some\path\tesseract.exe"
+
+    def test_falls_back_to_well_known_glob_when_not_on_path(
+        self, tmp_path, monkeypatch
+    ):
+        exe = tmp_path / "Tesseract-OCR" / "tesseract.exe"
+        exe.parent.mkdir()
+        exe.write_text("")
+        monkeypatch.setattr("zerobox.api.routes.setup.shutil.which", lambda _: None)
+        result = _find_executable(
+            "tesseract",
+            well_known_globs=[str(tmp_path / "Tesseract-OCR" / "tesseract.exe")],
+        )
+        assert result == str(exe)
+
+    def test_glob_matches_versioned_install(self, tmp_path, monkeypatch):
+        bin_dir = tmp_path / "gs" / "gs10.07.0" / "bin"
+        bin_dir.mkdir(parents=True)
+        exe = bin_dir / "gswin64c.exe"
+        exe.write_text("")
+        monkeypatch.setattr("zerobox.api.routes.setup.shutil.which", lambda _: None)
+        result = _find_executable(
+            "gswin64c",
+            well_known_globs=[str(tmp_path / "gs" / "gs*" / "bin" / "gswin64c.exe")],
+        )
+        assert result == str(exe)
+
+    def test_returns_none_when_nothing_found(self, tmp_path, monkeypatch):
+        monkeypatch.setattr("zerobox.api.routes.setup.shutil.which", lambda _: None)
+        result = _find_executable(
+            "tesseract",
+            well_known_globs=[str(tmp_path / "does-not-exist" / "tesseract.exe")],
+        )
+        assert result is None
+
+    def test_portable_takes_priority_over_path(self, tmp_path, monkeypatch):
+        portable = tmp_path / "resources" / "tesseract" / "tesseract.exe"
+        portable.parent.mkdir(parents=True)
+        portable.write_text("")
+        monkeypatch.setattr(
+            "zerobox.api.routes.setup._resources_dir",
+            lambda: tmp_path / "resources",
+        )
+        monkeypatch.setattr(
+            "zerobox.api.routes.setup.shutil.which",
+            lambda _: r"C:\different\path\tesseract.exe",
+        )
+        result = _find_executable("tesseract", "tesseract/tesseract.exe")
+        assert result == str(portable)
 
 
 class TestGetStatus:
