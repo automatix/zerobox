@@ -200,6 +200,35 @@ class TestSaveConfig:
         env = (tmp_path / ".env").read_text()
         assert "OLLAMA_BASE_URL=http://myhost:11434" in env
 
+    def test_save_expands_tilde_paths_instead_of_creating_literal_dir(
+        self, client, tmp_path, monkeypatch
+    ):
+        """Regression for #75: paths with `~` must be expanded before mkdir,
+        otherwise a literal `~` directory is created in the backend CWD."""
+        # Pretend $HOME points into the test tmp_path so we don't pollute the
+        # real user home with test directories.
+        monkeypatch.setenv("USERPROFILE", str(tmp_path / "home"))  # Windows
+        monkeypatch.setenv("HOME", str(tmp_path / "home"))  # POSIX fallback
+
+        resp = client.post(
+            "/setup/save",
+            json={
+                "input_folder": "~/zerobox/inbox",
+                "output_root": "~/zerobox/archive",
+                "profiles_dir": "~/zerobox/profiles",
+                "provider": "anthropic",
+                "api_key": "sk-ant-test",
+            },
+        )
+        assert resp.status_code == 200
+
+        # No literal `~` directory should have been created in the CWD.
+        assert not (tmp_path / "~").exists()
+
+        # The expanded directories should exist under the patched home.
+        for sub in ("inbox", "archive", "profiles"):
+            assert (tmp_path / "home" / "zerobox" / sub).is_dir()
+
     def test_save_makes_get_config_reflect_new_values(self, client, tmp_path):
         """Regression test for #72: wizard save must invalidate the cached
         config so the next /config (and pipeline services) see the new values,

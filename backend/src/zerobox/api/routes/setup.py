@@ -267,9 +267,10 @@ async def save_config(req: SaveConfigRequest) -> dict[str, str]:
 
     logger.info(".env written to %s", env_path)
 
-    # Create directories if they don't exist
+    # Create directories if they don't exist (expand `~` so we don't end up
+    # with a literal `~` directory under the backend CWD).
     for folder in [req.input_folder, req.output_root, req.profiles_dir]:
-        Path(folder).mkdir(parents=True, exist_ok=True)
+        Path(folder).expanduser().mkdir(parents=True, exist_ok=True)
 
     # Invalidate cached config + services so the new values take effect immediately
     from zerobox.api.dependencies import reload_config
