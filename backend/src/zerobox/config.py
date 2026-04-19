@@ -8,9 +8,21 @@ from pydantic import BaseModel, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _expand(v: str | Path | None) -> Path | None:
+    """Expand `~` in a path. Returns None unchanged so optional fields stay optional."""
+    if v is None:
+        return None
+    return Path(v).expanduser()
+
+
 class IntakeConfig(BaseModel):
     input_folder: Path = Path.home() / "zerobox" / "inbox"
     file_types: list[str] = [".pdf", ".tiff", ".tif", ".png", ".jpg", ".jpeg"]
+
+    @field_validator("input_folder", mode="before")
+    @classmethod
+    def _expand_input_folder(cls, v: str | Path) -> Path:
+        return _expand(v)
 
 
 class OcrConfig(BaseModel):
@@ -19,6 +31,11 @@ class OcrConfig(BaseModel):
     optimize: int = 1
     tesseract_path: Path | None = None
     ghostscript_path: Path | None = None
+
+    @field_validator("tesseract_path", "ghostscript_path", mode="before")
+    @classmethod
+    def _expand_optional(cls, v: str | Path | None) -> Path | None:
+        return _expand(v)
 
 
 class LLMConfig(BaseModel):
@@ -31,9 +48,19 @@ class FileManagerConfig(BaseModel):
     output_root: Path = Path.home() / "zerobox" / "archive"
     conflict_strategy: Literal["rename", "overwrite", "skip"] = "rename"
 
+    @field_validator("output_root", mode="before")
+    @classmethod
+    def _expand_output_root(cls, v: str | Path) -> Path:
+        return _expand(v)
+
 
 class AuditConfig(BaseModel):
     db_path: Path = Path.home() / "zerobox" / "audit.db"
+
+    @field_validator("db_path", mode="before")
+    @classmethod
+    def _expand_db_path(cls, v: str | Path) -> Path:
+        return _expand(v)
 
 
 class AppConfig(BaseSettings):
@@ -58,7 +85,7 @@ class AppConfig(BaseSettings):
     @field_validator("profiles_dir", mode="before")
     @classmethod
     def expand_profiles_dir(cls, v: str | Path) -> Path:
-        return Path(v).expanduser()
+        return _expand(v)
 
 
 def load_config(config_path: Path | None = None) -> AppConfig:
