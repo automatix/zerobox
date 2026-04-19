@@ -36,6 +36,9 @@ docs/keys.md
 # Background-agent worktrees (contents ignored, folder allowed)
 .claude/worktrees/*
 
+# Per-machine Claude Code permission overrides (project-level settings live in .claude/settings.json)
+.claude/settings.local.json
+
 # IDE
 .idea/
 .vscode/
