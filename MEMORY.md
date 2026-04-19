@@ -190,6 +190,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#116`: Document `chore/` branch prefix in `CLAUDE.md`
+**Request:** The repo has been using `chore/` for infra / tooling / lockfile branches (`chore/100-…`, `chore/114-…`), but `CLAUDE.md`'s **Tickets** section only lists `feature/bugfix/hotfix/release`. Legitimise `chore/` and explain the semantics.
+**Done:** Rewrote the branch-prefix paragraph in `CLAUDE.md` as a table with one row per prefix, each pointing at *why* a change happens rather than *what* files it touches. New row: **`chore/<description>`** — "Housekeeping — tooling, build config, CI, lockfile / dependency refreshes, internal docs, metadata. No behaviour change, no defect fixed, no feature added." Aligned with the Conventional Commits / Angular commit-type tradition.
+**Result:** `#116` in progress via branch `chore/116-document-chore-branch-prefix` (dogfooding the new prefix — this commit itself is a chore: a meta-doc update with no code-behaviour impact).
+
 ### `2026-04-19` — `#114`: Regenerate `frontend/package-lock.json` under pinned `npm@10.9.2` (follow-up to `#112`)
 **Request:** After `#112` / PR `#113` pinned the tooling but deferred the lockfile regeneration, open a follow-up ticket and implement it in the same session.
 **Done:** Installed Corepack globally (`npm install -g corepack` — Node `25.5.0` on this machine ships without it, as documented in `#112`'s `dev-testing.md` update). `corepack enable` silently no-op'd on Windows without admin shims, but `corepack install` + `corepack npm …` as a wrapper worked fine. Wiped `frontend/package-lock.json` + `frontend/node_modules/`, ran `corepack npm install` → the pinned `npm@10.9.2` fetched all deps and wrote the canonical lockfile. `corepack npm run check` → `0` errors / `0` warnings. `corepack npm run build` → success. Diff: `engines` section added, `libc` fields removed (confirming npm `10.x` doesn't write them — the drift direction is `11.x` writes / `10.x` strips), and one transitive bump `@napi-rs/wasm-runtime` `1.1.3` → `1.1.4` from a fresh resolution. From now on, Corepack-enabled dev machines will produce this exact lockfile, no churn.
