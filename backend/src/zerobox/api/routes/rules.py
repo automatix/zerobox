@@ -1,5 +1,7 @@
 """Rule profile CRUD routes (#18)."""
 
+import re
+import uuid
 from dataclasses import asdict
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -16,18 +18,57 @@ router = APIRouter()
 
 
 class CreateProfileBody(BaseModel):
-    id: str
     name: str
+    id: str | None = None
     description: str = ""
 
 
 class AddRuleBody(BaseModel):
-    id: str
     patterns: list[str]
     target_name_template: str
     target_folder_template: str
+    id: str | None = None
     priority: int = 0
     examples: list[str] = []
+
+
+# ── ID generation ──────────────────────────────────────────────────
+
+
+_SLUG_NON_ALNUM = re.compile(r"[^a-z0-9]+")
+
+
+def _slugify(name: str) -> str:
+    """Lowercase, non-alphanumeric → `-`, collapse dashes, strip.
+
+    Returns `""` if the name has no alphanumeric characters at all — the
+    caller is expected to handle that (falling back to a random id).
+    """
+    slug = _SLUG_NON_ALNUM.sub("-", name.lower()).strip("-")
+    return slug
+
+
+def _unique_profile_id(name: str, rules: RuleService) -> str:
+    """Derive a unique profile id from `name`, appending `-2`, `-3`, … on collision."""
+    base = _slugify(name) or uuid.uuid4().hex[:8]
+    candidate = base
+    suffix = 2
+    while True:
+        try:
+            rules.get_profile(candidate)
+        except FileNotFoundError:
+            return candidate
+        candidate = f"{base}-{suffix}"
+        suffix += 1
+
+
+def _unique_rule_id(profile: RuleProfile) -> str:
+    """Generate a short random id that doesn't collide with existing rules in this profile."""
+    taken = {r.id for r in (profile.rules or [])}
+    while True:
+        candidate = uuid.uuid4().hex[:8]
+        if candidate not in taken:
+            return candidate
 
 
 # ── Helpers ────────────────────────────────────────────────────────
@@ -59,14 +100,22 @@ def create_profile(
     body: CreateProfileBody,
     rules: RuleService = Depends(get_rules),
 ) -> dict:
-    try:
-        rules.get_profile(body.id)
-    except FileNotFoundError:
-        pass
+    if body.id is not None:
+        profile_id = body.id
+        try:
+            rules.get_profile(profile_id)
+        except FileNotFoundError:
+            pass
+        else:
+            raise HTTPException(
+                status_code=409, detail=f"Profile already exists: {profile_id}"
+            )
     else:
-        raise HTTPException(status_code=409, detail=f"Profile already exists: {body.id}")
+        profile_id = _unique_profile_id(body.name, rules)
 
-    profile = RuleProfile(id=body.id, name=body.name, description=body.description)
+    profile = RuleProfile(
+        id=profile_id, name=body.name, description=body.description
+    )
     rules.save_profile(profile)
     return _serialize_profile(profile)
 
@@ -87,19 +136,22 @@ def add_rule(
     rules: RuleService = Depends(get_rules),
 ) -> dict:
     try:
-        rule = Rule(
-            id=body.id,
-            profile_id=profile_id,
-            patterns=body.patterns,
-            target_name_template=body.target_name_template,
-            target_folder_template=body.target_folder_template,
-            priority=body.priority,
-            examples=body.examples,
-        )
-        rules.add_rule(profile_id, rule)
         profile = rules.get_profile(profile_id)
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Profile not found: {profile_id}")
+
+    rule_id = body.id if body.id is not None else _unique_rule_id(profile)
+    rule = Rule(
+        id=rule_id,
+        profile_id=profile_id,
+        patterns=body.patterns,
+        target_name_template=body.target_name_template,
+        target_folder_template=body.target_folder_template,
+        priority=body.priority,
+        examples=body.examples,
+    )
+    rules.add_rule(profile_id, rule)
+    profile = rules.get_profile(profile_id)
     return _serialize_profile(profile)
 
 
