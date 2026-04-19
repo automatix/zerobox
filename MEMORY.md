@@ -168,6 +168,16 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#70`: Untrack `.claude/settings.local.json`
+**Request:** Stop the recurring auto-appends to `settings.local.json` from blocking `gh pr merge`'s post-merge auto-pull.
+**Done:** `git rm --cached .claude/settings.local.json` (file stays on disk) and added the path to `.gitignore`. Project-level shared permissions remain in `.claude/settings.json`; the `.local` variant is by convention machine-specific.
+**Result:** `#70` closed via PR `#71`. Auto-pull on the merge worked cleanly for the first time in this batch.
+
+### `2026-04-19` — `#68`: Detect Tesseract/Ghostscript at well-known Windows paths
+**Request:** OCR Requirements check kept reporting `Not found` even after the user installed Tesseract (UB-Mannheim) and Ghostscript (GPL) — both installers leave the binaries under `C:\Program Files\…` without updating `PATH`.
+**Done:** Added a third fallback step to `_find_executable` in `backend/src/zerobox/api/routes/setup.py`: scan a list of well-known install-path globs after `shutil.which()` misses. Globs cover `C:\Program Files\Tesseract-OCR\tesseract.exe` (+ `(x86)`) and `C:\Program Files\gs\gs*\bin\gswin64c.exe` (+ `(x86)`/`gswin32c`). `5` new unit tests; `183` total green. Verified live against the running dev backend — `/setup/status` now reports both as available with correct paths without `PATH` changes.
+**Result:** `#68` closed via PR `#69`. Fix matches `DD-06`'s zero-setup goal.
+
 ### `2026-04-19` — `#65` + `#66`: Catch up `v0.2.0` release artifacts and codify deviation-transparency rule
 **Request:** (a) Run the missed steps `3`–`4` of the documented release process for `v0.2.0` (build installers + attach to release). (b) Codify a new rule: any deviation from a documented instruction must be explicit and visible, ideally asked about first.
 **Done:** `#65` — Ran `scripts/build-installer.ps1` (after correcting `pwsh` → `powershell` since PowerShell Core is not installed). PyInstaller built `zerobox-backend-x86_64-pc-windows-msvc.exe`, then `npm run tauri build` produced `Zerobox_0.2.0_x64_en-US.msi` (MSI) and `Zerobox_0.2.0_x64-setup.exe` (NSIS). Both uploaded to the existing `v0.2.0` GitHub Release; release notes updated. `#66` — Added a deviation-transparency paragraph to the `Interaction` section of project `CLAUDE.md`, mirrored in the user's global `CLAUDE.md` and in `feedback_make_deviations_explicit.md` in the session auto-memory.
