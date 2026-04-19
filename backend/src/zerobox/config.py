@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -77,9 +77,12 @@ class AppConfig(BaseSettings):
     audit: AuditConfig = AuditConfig()
     profiles_dir: Path = Path.home() / "zerobox" / "profiles"
 
-    # Secrets from .env
-    anthropic_api_key: str = ""
-    openai_api_key: str = ""
+    # Secrets from .env — wrapped in SecretStr so model_dump() masks them
+    # automatically (returns '**********' instead of the raw key) and so
+    # accidental repr/log/JSON dumps cannot leak credentials. Consumers that
+    # really need the raw value must call .get_secret_value() explicitly.
+    anthropic_api_key: SecretStr = SecretStr("")
+    openai_api_key: SecretStr = SecretStr("")
     ollama_base_url: str = "http://localhost:11434"
 
     @field_validator("profiles_dir", mode="before")
