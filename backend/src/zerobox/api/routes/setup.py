@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import glob
 import json
 import logging
 import os
@@ -9,6 +10,15 @@ import shutil
 import sys
 from pathlib import Path
 from typing import Literal
+
+WELL_KNOWN_TESSERACT_PATHS = [
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+    r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+]
+WELL_KNOWN_GHOSTSCRIPT_PATHS = [
+    r"C:\Program Files\gs\gs*\bin\gswin64c.exe",
+    r"C:\Program Files (x86)\gs\gs*\bin\gswin32c.exe",
+]
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -77,8 +87,16 @@ def _resources_dir() -> Path | None:
 def _find_executable(
     name: str,
     portable_subpath: str | None = None,
+    well_known_globs: list[str] | None = None,
 ) -> str | None:
-    """Find an executable: portable resources/ > system PATH."""
+    """Find an executable: portable resources/ > PATH > well-known install globs.
+
+    The glob fallback covers standard Windows installer layouts (e.g.
+    ``C:\\Program Files\\Tesseract-OCR\\tesseract.exe``) that do not add
+    themselves to the system ``PATH``. Globs are matched with :func:`glob.glob`
+    and the lexicographically largest match is returned (ordering is not
+    version-aware — in practice one install per tool is the common case).
+    """
     res = _resources_dir()
     if res and portable_subpath:
         portable = res / portable_subpath
@@ -86,7 +104,16 @@ def _find_executable(
             return str(portable)
 
     found = shutil.which(name)
-    return found
+    if found:
+        return found
+
+    if well_known_globs:
+        for pattern in well_known_globs:
+            matches = sorted(glob.glob(pattern), reverse=True)
+            for match in matches:
+                if Path(match).is_file():
+                    return match
+    return None
 
 
 def _is_setup_complete() -> bool:
@@ -111,8 +138,16 @@ async def get_setup_status() -> SetupStatus:
     """Check what is configured and what is missing."""
     base = _config_dir()
 
-    tesseract = _find_executable("tesseract", "tesseract/tesseract.exe")
-    ghostscript = _find_executable("gswin64c", "ghostscript/bin/gswin64c.exe")
+    tesseract = _find_executable(
+        "tesseract",
+        "tesseract/tesseract.exe",
+        well_known_globs=WELL_KNOWN_TESSERACT_PATHS,
+    )
+    ghostscript = _find_executable(
+        "gswin64c",
+        "ghostscript/bin/gswin64c.exe",
+        well_known_globs=WELL_KNOWN_GHOSTSCRIPT_PATHS,
+    )
 
     return SetupStatus(
         setup_complete=_is_setup_complete(),
@@ -168,8 +203,16 @@ async def validate_setup(req: ValidateRequest) -> ValidateResponse:
         except Exception as exc:
             provider_error = str(exc)
 
-    tesseract = _find_executable("tesseract", "tesseract/tesseract.exe")
-    ghostscript = _find_executable("gswin64c", "ghostscript/bin/gswin64c.exe")
+    tesseract = _find_executable(
+        "tesseract",
+        "tesseract/tesseract.exe",
+        well_known_globs=WELL_KNOWN_TESSERACT_PATHS,
+    )
+    ghostscript = _find_executable(
+        "gswin64c",
+        "ghostscript/bin/gswin64c.exe",
+        well_known_globs=WELL_KNOWN_GHOSTSCRIPT_PATHS,
+    )
 
     return ValidateResponse(
         provider_ok=provider_ok,
