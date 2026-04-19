@@ -137,6 +137,10 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architec
 **Decision:** The Windows installer bundles all runtime dependencies (Python, Tesseract, Ghostscript) so the end user has zero prerequisites to install manually.
 **Rationale:** Minimum effort for the end user. Trade-off: larger installer (~`200`–`300` MB), but zero-setup experience. Python backend will be packaged as standalone executable (via PyInstaller or cx_Freeze). Tesseract and Ghostscript are bundled alongside. Only user-provided requirement: an API key (Claude/OpenAI) unless using a local LLM.
 
+### `DD-07` — Config Storage Location (`2026-04-19`)
+**Decision:** Hybrid layout. `config.json` and `.env` live in an OS-conventional per-user config directory: `%APPDATA%\zerobox\` on Windows, `~/Library/Application Support/zerobox/` on macOS, `$XDG_CONFIG_HOME/zerobox/` (fallback `~/.config/zerobox/`) on Linux. The env var `ZEROBOX_CONFIG_DIR` overrides for dev/tests. Final fallback: `~/.zerobox/`. Data folders (inbox, archive/output, profiles, audit DB) remain freely configurable via `config.json` — no change there.
+**Rationale:** OS standard (Windows Roaming-`AppData`, XDG spec, macOS Application Support). Multi-user friendly. Survives re-installs and updates. No admin rights needed (unlike `Program Files\`). Installer builds never have to write next to the exe. Single source of truth via `zerobox.paths.config_dir` so every consumer — `load_config`, `AppConfig` `.env`-file resolution, the wizard's `/setup/save` + `/setup/status` — sees the same directory. Supersedes the previous `Path.cwd()` (dev) / `Path(sys.executable).parent` (frozen) behaviour, which was fragile and required admin rights in installer builds. Ticket `#80`.
+
 ### `DD-04` — Architecture (`2026-04-13`)
 **Decision:** Modular service architecture with `9` modules, LLM provider abstraction, dependency injection, FastAPI backend as Tauri sidecar.
 **Rationale:** See `docs/architecture.md` for the full living document.

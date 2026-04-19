@@ -15,8 +15,12 @@ from zerobox.app import create_app
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
-    """Create a test client with a temporary config directory."""
-    monkeypatch.chdir(tmp_path)
+    """Create a test client with a temporary config directory.
+
+    Points `$ZEROBOX_CONFIG_DIR` at `tmp_path` so `config.json` / `.env`
+    writes/reads stay isolated (see DD-07).
+    """
+    monkeypatch.setenv("ZEROBOX_CONFIG_DIR", str(tmp_path))
     app = create_app()
     return TestClient(app)
 

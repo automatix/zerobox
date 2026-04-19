@@ -166,7 +166,7 @@ def test_reload_config_makes_next_get_config_see_new_disk_state(
 ):
     """/setup/save writes config.json and then calls reload_config();
     the next get_config() call must reflect the new file."""
-    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("ZEROBOX_CONFIG_DIR", str(tmp_path))
     reload_config()  # start from a clean cache
 
     (tmp_path / "config.json").write_text(
