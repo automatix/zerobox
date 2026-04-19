@@ -81,20 +81,6 @@ npm run test:sync-docs
 
 `frontend/public/docs/` is git-ignored — the synced copies are derived artefacts, never committed. If you change the list of bundled docs, edit the `files` array in `frontend/scripts/sync-docs.mjs` and the `expected` array in `frontend/scripts/sync-docs.test.mjs`, and the `docs` array in `frontend/src/views/HelpTab.svelte`.
 
-## Docs Bundle (release artifact)
-
-Part of the release process: `scripts/build-docs-bundle.(ps1|sh)` creates `docs.zip` in the repo root containing the end-user docs (`README.md`, `docs/user-guide.md`) plus the technical/dev docs (`docs/architecture.md`, `docs/dev-testing.md`, `docs/roadmap.md`, `docs/postman/`). The zip is attached to the GitHub Release alongside the MSI/NSIS installers so downstream users have offline documentation without cloning the repo.
-
-```powershell
-scripts/build-docs-bundle.ps1
-```
-
-```bash
-scripts/build-docs-bundle.sh
-```
-
-`docs.zip` and the transient `.docs-bundle-staging/` directory are git-ignored.
-
 ## Dev-Uninstall / Reset
 
 Wipe zerobox state selectively to retest the First-Run-Wizard or pipeline from a clean slate. Reads the current `config.json` (if present) so user-configured paths are honoured.
