@@ -190,6 +190,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#110`: Release `v0.5.1` (patch — wizard UX polish + `svelte-check` fix)
+**Request:** Bundle `#106` + `#108` into a patch release. Tag only — no installer rebuild, no GitHub Release with executables.
+**Done:** Manifests bumped `0.5.0` → `0.5.1` across `backend/pyproject.toml`, `backend/src/zerobox/app.py`, `frontend/package.json`, `frontend/package-lock.json`, `frontend/src-tauri/Cargo.toml`, `frontend/src-tauri/Cargo.lock` (`zerobox` entry), `frontend/src-tauri/tauri.conf.json`, and the header badge in `frontend/src/App.svelte`. Annotated tag `v0.5.1` created on `master` after PR `#111` merged. Deviation from the standard release procedure in `CLAUDE.md`: steps `3` (installer build) and `4` (GitHub Release with installers) were skipped on explicit user direction — both shipped changes are contained to `SetupWizard.svelte` (UX polish + type-safety), no backend binary change.
+**Result:** `#110` closed via PR `#111`. Tag: https://github.com/automatix/zerobox/releases/tag/v0.5.1 (tag page only; no Release attached).
+
 ### `2026-04-19` — `#108`: Fix pre-existing `svelte-check` type errors in `SetupWizard.svelte`
 **Request:** Patch the three `svelte-check` errors that surfaced during `#106` (`depStatus` narrowing + `step === 'ocr'` literal-type comparison).
 **Done:** Root cause: Svelte `5`'s `$state()` infers the literal type from its argument, so `let step: Step = $state('provider')` narrows `step` to `'provider'` (left-hand annotation doesn't widen it in `svelte-check`'s view). Switched both problem declarations to the explicit generic form: `let step = $state<Step>('provider')` and `let depStatus = $state<DepStatus | null>(null)`. `npm run check` now reports `0` errors / `0` warnings. No behavioural change.
