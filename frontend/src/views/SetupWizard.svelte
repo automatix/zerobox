@@ -3,7 +3,7 @@
 
   type Step = 'provider' | 'folders' | 'ocr' | 'summary';
 
-  let step: Step = $state('provider');
+  let step = $state<Step>('provider');
   let saving = $state(false);
   let validating = $state(false);
   let validationResult: {
@@ -34,7 +34,7 @@
     ghostscript_available: boolean;
     ghostscript_path: string | null;
   };
-  let depStatus: DepStatus | null = $state(null);
+  let depStatus = $state<DepStatus | null>(null);
   let depLoading = $state(false);
   let depError: string | null = $state(null);
 
