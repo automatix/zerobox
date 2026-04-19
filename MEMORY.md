@@ -190,6 +190,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#102`: Release `v0.5.0` (minor — in-app Help tab + release-procedure cleanup)
+**Request:** Bundle `#98` + `#100` into `v0.5.0` with installer rebuild.
+**Done:** Manifests bumped `0.4.0` → `0.5.0`, `App.svelte` header updated, tag `v0.5.0` pushed. Installer build produced `zerobox_0.5.0_x64_en-US.msi` + `zerobox_0.5.0_x64-setup.exe`, both attached to the GitHub Release. Release notes follow the new template from `#100` — installer artifacts plus a **Documentation** section with tag-pinned `/docs/*.md` + `/README.md` links, no `docs.zip`.
+**Result:** `#102` closed via PR `#103`. Release: https://github.com/automatix/zerobox/releases/tag/v0.5.0
+
 ### `2026-04-19` — `#100`: Drop `docs.zip` release artifact, link docs from release notes
 **Request:** After `#98` made the docs available inside the app, the `docs.zip` artifact introduced by `#92` became redundant. Remove it; use tag-pinned doc links in the release notes where that's actually useful.
 **Done:** Deleted `scripts/build-docs-bundle.(ps1|sh)`, cleaned the `docs.zip`/`.docs-bundle-staging/` entries from `.gitignore`, removed the "Docs Bundle (release artifact)" section from `docs/dev-testing.md`, and collapsed `CLAUDE.md`'s versioning steps `4`+`5` back to a single step `4` that uploads only the installer artifacts while embedding a **Documentation** section (tag-pinned `/docs/*.md` + `/README.md` links) in the release notes. `v0.4.0`'s `docs.zip` stays attached to that release as a historical artifact — no retroactive deletion.
