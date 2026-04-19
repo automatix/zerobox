@@ -173,6 +173,21 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#84`: Release `v0.3.0` (minor — hybrid config layout + dev-uninstall CLI)
+**Request:** Minor release bundling `#80` + `#81`, per full documented procedure, with lowercase `zerobox` brand in user-visible UI.
+**Done:** Bumped version `0.2.1` → `0.3.0` in all manifests. Rebranded user-visible strings: FastAPI title, Tauri `productName` + window title, `App.svelte` header, `SetupWizard` header + OCR warning prose (docs/`MEMORY.md` prose intentionally untouched for now). Tag `v0.3.0` pushed. Installer build ran, MSI + NSIS attached to the GitHub Release, release notes consolidated `#80` (hybrid config) and `#81` (dev-uninstall CLI).
+**Result:** `#84` closed via PR `#85`. Release: https://github.com/automatix/zerobox/releases/tag/v0.3.0
+
+### `2026-04-19` — `#81`: Dev-uninstall CLI for selective state reset
+**Request:** A CLI to wipe zerobox state (config, env, data, audit) selectively or entirely, so the First-Run-Wizard and pipeline can be tested from zero without hand-hunting files.
+**Done:** Implementation as a Python module (`backend/src/zerobox/dev_uninstall.py`, runnable via `python -m zerobox.dev_uninstall`) so it reuses `zerobox.paths` and is cross-platform. Thin PowerShell and Bash wrappers in `scripts/` mirror the `build-installer` pattern. Six targets, each selectable individually plus `--all`; interactive mode when no flags; confirmation prompt skippable via `--yes`; honours the paths in `config.json` if present (else falls back to `~/zerobox/{inbox,archive,profiles,audit.db}`). `12` new unit tests cover target resolution, file/dir deletion, all CLI modes, and a description-completeness guard. `218` total tests green. `docs/dev-testing.md` gained a "Dev-Uninstall / Reset" section; "Resetting the wizard" now points at the new tool.
+**Result:** `#81` closed via PR `#83`.
+
+### `2026-04-19` — `#80`: Hybrid config layout — OS-conventional per-user dir (`DD-07`)
+**Request:** Clean up the config location. Old behaviour (`Path.cwd()` in dev, `Path(sys.executable).parent` in frozen) is fragile and needs admin rights in `Program Files\` installer builds. Decide + implement.
+**Done:** Added `DD-07` (hybrid layout): `config.json` + `.env` under `%APPDATA%\zerobox\` (Windows), `~/Library/Application Support/zerobox/` (macOS), `$XDG_CONFIG_HOME/zerobox/` fallback `~/.config/zerobox/` (Linux). `$ZEROBOX_CONFIG_DIR` overrides for dev/tests. Data folders (inbox, archive/output, profiles, audit DB) remain user-configurable. New `backend/src/zerobox/paths.py` centralizes resolution (`config_dir`, `config_file`, `env_file`). `load_config` now reads from `config_file()` and passes `_env_file` into `AppConfig`. `setup.py:_config_dir()` delegates; the `sys.frozen` special case is gone. `save_config` `mkdir(parents=True)`s the config dir before writing. `8` new tests per platform branch + env override; existing fixtures switched from `monkeypatch.chdir` to `ZEROBOX_CONFIG_DIR`. `206` total tests green. `docs/architecture.md` Configuration section documents the new layout.
+**Result:** `#80` closed via PR `#82`.
+
 ### `2026-04-19` — `#78`: Release `v0.2.1` (patch — bundle `#68` + `#72` + `#74` + `#75`)
 **Request:** Bundle the four post-`v0.2.0` fixes into a patch release following the full documented procedure.
 **Done:** Bumped version `0.2.0` → `0.2.1` in all manifests (`backend/pyproject.toml`, `app.py` FastAPI title, frontend `package.json` + lockfile, `Cargo.toml` + `Cargo.lock`, `tauri.conf.json`, `App.svelte` header). Tag `v0.2.1` created and pushed. Installer build via `scripts/build-installer.ps1` produced MSI + NSIS; both attached to the GitHub Release. Release notes consolidated `#68`, `#72`, `#74`, `#75`.
