@@ -190,6 +190,16 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#98`: In-app Help tab with rendered, bundled docs (`IDEA-13` phase 2)
+**Request:** "Bring the docs into the application — that was actually what I meant by 'ship with'." Implement formatted, in-app access to the docs.
+**Done:** Added a fifth tab `Help` to the main app. Sidebar lists User Guide, README, Architecture, Dev Testing, Roadmap; right pane renders the selected `.md` with `marked` (parser) + `dompurify` (sanitiser). New `frontend/scripts/sync-docs.mjs` copies the repo's `.md` files into `frontend/public/docs/` so Vite bundles them into `dist/` and Tauri into the installer; hooked into `predev` / `prebuild`, plus standalone `npm run sync-docs` and a smoke test `npm run test:sync-docs`. `frontend/public/docs/` is git-ignored (derived artefact). `marked` + `dompurify` added as prod deps. Frontend bundle grew from `~78 KB` to `~143 KB` JS — acceptable for a desktop app. `docs/user-guide.md` ("five tabs", new Help section) and `docs/dev-testing.md` (new In-App Docs Sync section) updated per the keep-current rule. Deliberately did **not** add Vitest / svelte-testing-library — too much new test infra for one component; smoke test guards the build-time sync, which is the most fragile piece.
+**Result:** `#98` closed via PR `#99`.
+
+### `2026-04-19` — `#96`: Release `v0.4.0` (minor — docs + process, no installer rebuild)
+**Request:** Bump to `0.4.0` for the post-`v0.3.1` docs + script changes (`#90`, `#91`, `#92`); no installer build because the app binary itself didn't change.
+**Done:** Manifests bumped, `App.svelte` header updated, tag `v0.4.0` pushed. GitHub Release created with text-only release notes; only artifact attached is `docs.zip` (the new artifact type from `#92`). MSI/NSIS were intentionally omitted — `v0.3.1` installers are functionally equivalent.
+**Result:** `#96` closed via PR `#97`. Release: https://github.com/automatix/zerobox/releases/tag/v0.4.0
+
 ### `2026-04-19` — `#92`: Ship documentation with the release — `IDEA-13` phase 1
 **Request:** Implement `IDEA-13`; keep it scoped and honest about what's phase 1 vs. phase 2.
 **Done:** Added `scripts/build-docs-bundle.(ps1|sh)` that zips `README.md` and the user-facing/technical docs under `docs/` (plus `docs/postman/`) into `docs.zip` at the repo root, mirroring the `build-installer` dual-script pattern. Release procedure in `CLAUDE.md` grew a step `4` (build docs bundle) and step `5` uploads `docs.zip` alongside MSI/NSIS. `dev-testing.md` documents the script. `.gitignore` ignores `docs.zip` and the staging dir. Phase `2` (HTML rendering, Tauri resource bundling, in-app Help tab) stays in `IDEA-13` for a future pass.
