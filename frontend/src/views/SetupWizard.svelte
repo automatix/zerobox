@@ -391,13 +391,16 @@
 
     <!-- Footer / Navigation -->
     <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between">
-      <button
-        onclick={back}
-        disabled={step === 'provider'}
-        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Back
-      </button>
+      {#if step !== 'provider'}
+        <button
+          onclick={back}
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+        >
+          Back
+        </button>
+      {:else}
+        <div></div>
+      {/if}
 
       {#if step === 'summary'}
         <button
