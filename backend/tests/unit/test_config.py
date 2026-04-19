@@ -1,9 +1,11 @@
-"""Tests for path expansion in config (#75)."""
+"""Tests for path expansion (#75) and secret masking (#74) in config."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
+
+from pydantic import SecretStr
 
 from zerobox.config import (
     AppConfig,
@@ -48,6 +50,33 @@ class TestPathExpansion:
     def test_app_profiles_dir_expands_tilde(self) -> None:
         cfg = AppConfig(profiles_dir="~/zerobox/profiles")
         assert cfg.profiles_dir == HOME / "zerobox" / "profiles"
+
+
+class TestSecretMasking:
+    def test_api_keys_are_secret_str(self) -> None:
+        cfg = AppConfig(
+            anthropic_api_key="sk-ant-secret",
+            openai_api_key="sk-openai-secret",
+        )
+        assert isinstance(cfg.anthropic_api_key, SecretStr)
+        assert isinstance(cfg.openai_api_key, SecretStr)
+        assert cfg.anthropic_api_key.get_secret_value() == "sk-ant-secret"
+        assert cfg.openai_api_key.get_secret_value() == "sk-openai-secret"
+
+    def test_model_dump_json_masks_api_keys(self) -> None:
+        cfg = AppConfig(
+            anthropic_api_key="sk-ant-secret-value",
+            openai_api_key="sk-openai-secret-value",
+        )
+        dumped = cfg.model_dump(mode="json")
+        assert "sk-ant-secret-value" not in json.dumps(dumped)
+        assert "sk-openai-secret-value" not in json.dumps(dumped)
+        assert dumped["anthropic_api_key"] == "**********"
+        assert dumped["openai_api_key"] == "**********"
+
+    def test_repr_masks_api_keys(self) -> None:
+        cfg = AppConfig(anthropic_api_key="sk-ant-leaks-in-stack-traces")
+        assert "sk-ant-leaks-in-stack-traces" not in repr(cfg)
 
 
 class TestLoadConfigExpansion:

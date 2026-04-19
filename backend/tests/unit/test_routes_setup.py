@@ -229,6 +229,26 @@ class TestSaveConfig:
         for sub in ("inbox", "archive", "profiles"):
             assert (tmp_path / "home" / "zerobox" / sub).is_dir()
 
+    def test_get_config_does_not_leak_api_keys(self, client, tmp_path):
+        """Regression for #74: /config response must mask secrets."""
+        client.post(
+            "/setup/save",
+            json={
+                "input_folder": str(tmp_path / "inbox"),
+                "output_root": str(tmp_path / "archive"),
+                "profiles_dir": str(tmp_path / "profiles"),
+                "provider": "anthropic",
+                "api_key": "sk-ant-supersecret-value",
+            },
+        )
+
+        config_resp = client.get("/config")
+        assert config_resp.status_code == 200
+        body = config_resp.text
+        assert "sk-ant-supersecret-value" not in body
+        config = config_resp.json()
+        assert config["anthropic_api_key"] == "**********"
+
     def test_save_makes_get_config_reflect_new_values(self, client, tmp_path):
         """Regression test for #72: wizard save must invalidate the cached
         config so the next /config (and pipeline services) see the new values,
