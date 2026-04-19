@@ -156,7 +156,7 @@
   <div class="w-full max-w-xl bg-white rounded-lg shadow-lg overflow-hidden">
     <!-- Header -->
     <div class="bg-indigo-600 px-6 py-4">
-      <h1 class="text-lg font-bold text-white">Zerobox Setup</h1>
+      <h1 class="text-lg font-bold text-white">zerobox Setup</h1>
       <p class="text-indigo-200 text-sm mt-1">Configure your document processing pipeline</p>
     </div>
 
@@ -345,7 +345,7 @@
                 </div>
                 {#if !ocrRequirementsMet}
                   <p class="text-xs text-amber-600 mt-2">
-                    OCR is required for Zerobox to process scans. Please install the missing dependencies and click "Check requirements" to re-verify — see the Prerequisites section in README.md for setup instructions.
+                    OCR is required for zerobox to process scans. Please install the missing dependencies and click "Check requirements" to re-verify — see the Prerequisites section in README.md for setup instructions.
                   </p>
                 {/if}
               </div>
