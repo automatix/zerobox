@@ -1,5 +1,19 @@
 # Dev Testing Notes
 
+## Prerequisites
+
+System-level tools that must be installed before running zerobox from source (none of these are bundled by `pip` / `npm`):
+
+| Tool | Version | Purpose |
+|---|---|---|
+| Python | `3.13`+ | Backend runtime |
+| Node.js | `20`+ | Frontend build + dev server |
+| Rust toolchain | stable | Building the Tauri shell (only needed for `cargo tauri dev` / installer builds) |
+| Tesseract OCR | `5`+ | Text extraction (invoked by `ocrmypdf`) |
+| Ghostscript | `10`+ | PDF processing (invoked by `ocrmypdf`) |
+
+All Python packages — including `uvicorn`, `fastapi`, `ocrmypdf`, `anthropic`, `openai`, `pytest`, `ruff` — are installed automatically by `pip install -e ".[dev]"` and do **not** need to be installed separately. The same applies to the installed end-user build: the Windows installer (MSI/NSIS) bundles the backend (including `uvicorn`) as a standalone PyInstaller executable, so end users only need Tesseract and Ghostscript on their system.
+
 ## Running Zerobox in Dev Mode (without installer)
 
 Two terminals needed:
@@ -8,11 +22,24 @@ Two terminals needed:
 
 ```bash
 cd backend
+
+# Create and activate a virtual environment (strongly recommended — avoids
+# the uvicorn/pytest/ruff console scripts landing outside your PATH).
+python -m venv .venv
+source .venv/Scripts/activate   # Windows (Git Bash) / use .venv\Scripts\activate.bat in cmd, .venv\Scripts\Activate.ps1 in PowerShell
+# source .venv/bin/activate      # Linux/macOS
+
 pip install -e ".[dev]"
 uvicorn zerobox.app:create_app --factory --reload
 ```
 
 API available at `http://localhost:8000` (Swagger UI at `/docs`).
+
+> **PATH-safe alternative.** If `uvicorn: command not found` appears despite a successful install (typical on Windows when no venv is used and the user-site `Scripts/` directory isn't on `PATH`), run the server via the Python module instead — this always works:
+>
+> ```bash
+> python -m uvicorn zerobox.app:create_app --factory --reload
+> ```
 
 ### Terminal 2 — Frontend
 
@@ -35,10 +62,12 @@ Open `http://localhost:5173` in the browser.
 
 ```bash
 cd frontend
-cargo tauri dev
+npm run tauri -- dev
 ```
 
-This starts both the backend sidecar and the Tauri WebView window. In dev mode (`debug_assertions`), the backend is **not** auto-started by Tauri — you must run it manually in Terminal 1.
+This uses the `@tauri-apps/cli` devDependency already installed by `npm install` — no extra global install required. `cargo tauri dev` works equivalently but only if you've run `cargo install tauri-cli` beforehand.
+
+Either command starts both the backend sidecar and the Tauri WebView window. In dev mode (`debug_assertions`), the backend is **not** auto-started by Tauri — you must run it manually in Terminal 1.
 
 ## Testing the setup endpoints directly
 
