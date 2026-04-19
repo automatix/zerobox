@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from zerobox.api.dependencies import (
+    _CACHED_GETTERS,
     get_audit,
     get_classifier,
     get_config,
@@ -14,6 +15,7 @@ from zerobox.api.dependencies import (
     get_pipeline,
     get_provider,
     get_rules,
+    reload_config,
 )
 from zerobox.audit.service import AuditService
 from zerobox.classifier.service import ClassifierService
@@ -138,3 +140,47 @@ def test_lru_cache_returns_same_instance(mock_config):
     audit_a = get_audit()
     audit_b = get_audit()
     assert audit_a is audit_b
+
+
+# ── reload_config invalidates cached getters ───────────────────────
+
+
+def test_reload_config_clears_all_cached_getters(mock_config):
+    # Prime every cache so each getter has an entry to clear.
+    with patch("zerobox.api.dependencies.create_provider"):
+        for getter in _CACHED_GETTERS:
+            getter()
+        for getter in _CACHED_GETTERS:
+            assert getter.cache_info().currsize == 1, f"{getter.__name__} not primed"
+
+        reload_config()
+
+        for getter in _CACHED_GETTERS:
+            assert getter.cache_info().currsize == 0, (
+                f"{getter.__name__} cache not cleared"
+            )
+
+
+def test_reload_config_makes_next_get_config_see_new_disk_state(
+    tmp_path, monkeypatch
+):
+    """/setup/save writes config.json and then calls reload_config();
+    the next get_config() call must reflect the new file."""
+    monkeypatch.chdir(tmp_path)
+    reload_config()  # start from a clean cache
+
+    (tmp_path / "config.json").write_text(
+        '{"ocr": {"language": "deu+eng+rus"}}'
+    )
+    first = get_config()
+    assert first.ocr.language == "deu+eng+rus"
+
+    # Overwrite with a different value, then reload.
+    (tmp_path / "config.json").write_text(
+        '{"ocr": {"language": "fra+ita"}}'
+    )
+    # Without reload_config(), the cached value would still be deu+eng+rus.
+    assert get_config().ocr.language == "deu+eng+rus"
+
+    reload_config()
+    assert get_config().ocr.language == "fra+ita"

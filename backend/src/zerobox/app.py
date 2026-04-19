@@ -57,7 +57,11 @@ def create_app() -> FastAPI:
 
     @app.get("/config")
     async def get_config() -> dict:
-        return config.model_dump(mode="json")
+        # Read via the cached dependency so /setup/save's reload_config() is
+        # visible here (the closure variable above is set once at startup).
+        from zerobox.api.dependencies import get_config as _get_cached_config
+
+        return _get_cached_config().model_dump(mode="json")
 
     # Include routers
     from zerobox.api.routes import audit, pipeline, proposals, rules, setup
