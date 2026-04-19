@@ -174,6 +174,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#86`: Rule-Profile creation returns `422`
+**Request:** Bug report — creating a profile in the UI fails with `API error: 422` (screenshot showed `Dummy` / `Dummy profile` input).
+**Done:** Root cause: `CreateProfileBody.id` (and `AddRuleBody.id`) were required, but the frontend forms only send `{name, description}` / `{patterns, ...}` — pydantic rejected at the schema boundary. Made both ids optional; backend now auto-generates. Profile id = slugified name (lowercase, non-alphanum → `-`, collapse, strip, `-2`/`-3`/… on collision, falls back to `uuid4().hex[:8]` when the slug would be empty). Rule id = `uuid4().hex[:8]` deduped against the profile. `add_rule` now `get_profile`s before generating an id so missing profiles surface as `404`. Explicit ids still honoured. `7` new unit tests; `225` total green. Live `curl` confirmed `201 {"id":"dummy",...}`.
+**Result:** `#86` closed via PR `#87`.
+
 ### `2026-04-19` — `#84`: Release `v0.3.0` (minor — hybrid config layout + dev-uninstall CLI)
 **Request:** Minor release bundling `#80` + `#81`, per full documented procedure, with lowercase `zerobox` brand in user-visible UI.
 **Done:** Bumped version `0.2.1` → `0.3.0` in all manifests. Rebranded user-visible strings: FastAPI title, Tauri `productName` + window title, `App.svelte` header, `SetupWizard` header + OCR warning prose (docs/`MEMORY.md` prose intentionally untouched for now). Tag `v0.3.0` pushed. Installer build ran, MSI + NSIS attached to the GitHub Release, release notes consolidated `#80` (hybrid config) and `#81` (dev-uninstall CLI).
