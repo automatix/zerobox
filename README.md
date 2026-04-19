@@ -103,7 +103,7 @@ The First-Run-Wizard and the `llm.model` setting in `config.json` expect an exac
 - **Python** `3.13`+
 - **Tesseract OCR** — required by `ocrmypdf` for text extraction
 - **Ghostscript** — required by `ocrmypdf` for PDF processing
-- **Node.js** `20`+ — for the frontend
+- **Node.js** `20`+ — for the frontend (pinned via `frontend/.nvmrc`; npm pinned via `packageManager` → enable with `corepack enable`, see `docs/dev-testing.md`)
 - **Rust toolchain** — for building the Tauri shell
 - **API key** — Anthropic or OpenAI, unless using a local Ollama instance
 
