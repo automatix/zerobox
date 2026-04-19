@@ -30,6 +30,8 @@ See [`docs/architecture.md`](docs/architecture.md) for the full architecture doc
 
 ## User Guide
 
+> For a full walkthrough of the app — First-Run-Wizard, the Review / Rule Profiles / Audit Log / Settings tabs, what to enter in the Rule form, typical workflows, and troubleshooting — see [`docs/user-guide.md`](docs/user-guide.md).
+
 ### Installation
 
 Download the latest installer from the [Releases](https://github.com/automatix/zerobox/releases) page. Available formats:
