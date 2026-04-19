@@ -68,7 +68,7 @@ You can override this with the `ZEROBOX_CONFIG_DIR` environment variable before 
 
 ## Main App
 
-After the wizard, zerobox shows four tabs.
+After the wizard, zerobox shows five tabs.
 
 ### Review
 
@@ -135,6 +135,10 @@ The database itself defaults to `~/zerobox/audit.db` and can be relocated via `c
 Read-only view of the merged configuration (`config.json` + `.env`). API keys are masked (`**********`) for safety. To change a setting, edit the config file directly in your per-user config directory (see Step `4` above) and restart zerobox.
 
 (An in-app editor is tracked in `IDEA-12`.)
+
+### Help
+
+Renders this user guide and the technical docs (`README.md`, `architecture.md`, `dev-testing.md`, `roadmap.md`) directly inside the app. The docs are bundled with the installer — no network access required after install. Sidebar on the left lets you switch between documents. Source of truth for every doc is still the corresponding `.md` file in the repo; the build step copies them into the app at compile time.
 
 ---
 

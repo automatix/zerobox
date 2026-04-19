@@ -4,16 +4,18 @@
   import RuleProfiles from './views/RuleProfiles.svelte';
   import AuditLog from './views/AuditLog.svelte';
   import Settings from './views/Settings.svelte';
+  import HelpTab from './views/HelpTab.svelte';
   import SetupWizard from './views/SetupWizard.svelte';
   import ToastContainer from './views/ToastContainer.svelte';
 
-  type Tab = 'review' | 'rules' | 'audit' | 'settings';
+  type Tab = 'review' | 'rules' | 'audit' | 'settings' | 'help';
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'review', label: 'Review' },
     { id: 'rules', label: 'Rule Profiles' },
     { id: 'audit', label: 'Audit Log' },
     { id: 'settings', label: 'Settings' },
+    { id: 'help', label: 'Help' },
   ];
 
   let activeTab: Tab = $state('review');
@@ -99,6 +101,8 @@
         <AuditLog />
       {:else if activeTab === 'settings'}
         <Settings />
+      {:else if activeTab === 'help'}
+        <HelpTab />
       {/if}
     </main>
 

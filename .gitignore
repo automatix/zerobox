@@ -28,6 +28,9 @@ frontend/src-tauri/binaries/*.exe
 # Tauri generated code
 frontend/src-tauri/gen/
 
+# Synced docs (regenerated from /docs and /README.md by frontend/scripts/sync-docs.mjs)
+frontend/public/docs/
+
 # Local dev files (directory tracked, contents ignored)
 .local/*
 !.local/.gitkeep

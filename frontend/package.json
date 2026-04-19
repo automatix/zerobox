@@ -4,17 +4,22 @@
   "version": "0.4.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/sync-docs.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/sync-docs.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "sync-docs": "node scripts/sync-docs.mjs",
+    "test:sync-docs": "node scripts/sync-docs.test.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@tailwindcss/vite": "^4.2.2",
     "@tauri-apps/cli": "^2.10.1",
     "@tsconfig/svelte": "^5.0.8",
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^24.12.2",
     "svelte": "^5.55.1",
     "svelte-check": "^4.4.6",
@@ -24,6 +29,8 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2.10.1",
-    "@tauri-apps/plugin-shell": "^2.3.5"
+    "@tauri-apps/plugin-shell": "^2.3.5",
+    "dompurify": "^3.4.0",
+    "marked": "^18.0.2"
   }
 }
