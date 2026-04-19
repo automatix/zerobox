@@ -190,6 +190,21 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#92`: Ship documentation with the release — `IDEA-13` phase 1
+**Request:** Implement `IDEA-13`; keep it scoped and honest about what's phase 1 vs. phase 2.
+**Done:** Added `scripts/build-docs-bundle.(ps1|sh)` that zips `README.md` and the user-facing/technical docs under `docs/` (plus `docs/postman/`) into `docs.zip` at the repo root, mirroring the `build-installer` dual-script pattern. Release procedure in `CLAUDE.md` grew a step `4` (build docs bundle) and step `5` uploads `docs.zip` alongside MSI/NSIS. `dev-testing.md` documents the script. `.gitignore` ignores `docs.zip` and the staging dir. Phase `2` (HTML rendering, Tauri resource bundling, in-app Help tab) stays in `IDEA-13` for a future pass.
+**Result:** `#92` closed via PR `#95`.
+
+### `2026-04-19` — `#91`: Codify "keep tests and docs current after every change"
+**Request:** Add a project- and global-wide rule that every change updates tests and docs in the same PR — no drift.
+**Done:** Extended `CLAUDE.md` Interaction with a second paragraph requiring matching test + doc updates per change (listing the docs to consider: `README.md`, user-guide, architecture, dev-testing, roadmap, `MEMORY.md`, Postman, Gherkin). Pure internal refactors still keep tests green but only need doc updates when a reader of the docs would notice a difference. Mirrored in the user's global `CLAUDE.md` and `feedback_keep_tests_and_docs_current.md` in the session auto-memory.
+**Result:** `#91` closed via PR `#94`.
+
+### `2026-04-19` — `#90`: Write end-user guide (`docs/user-guide.md`)
+**Request:** The repo had no user-facing usage documentation — user was stuck on what to enter in the Rule form. Write a full user manual under `docs/` and link from `README.md`.
+**Done:** New `docs/user-guide.md` covering the mental model of the pipeline, the First-Run-Wizard step by step, the Review / Rule Profiles / Audit Log / Settings tabs, Rule field semantics with a concrete example (plus the important note that name/folder templates are LLM guidelines, not Python format strings), typical first-time and ongoing workflows, troubleshooting, and per-platform file locations. `README.md` User Guide section now opens with a link to it.
+**Result:** `#90` closed via PR `#93`.
+
 ### `2026-04-19` — `#88`: Release `v0.3.1` (patch — bundle `#86`)
 **Request:** Ship a patch release for the profile-creation fix.
 **Done:** Bumped `0.3.0` → `0.3.1` in all manifests + `App.svelte` header. Tag `v0.3.1` pushed. Installer build produced MSI + NSIS; both attached to the GitHub Release.
