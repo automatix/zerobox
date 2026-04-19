@@ -271,4 +271,9 @@ async def save_config(req: SaveConfigRequest) -> dict[str, str]:
     for folder in [req.input_folder, req.output_root, req.profiles_dir]:
         Path(folder).mkdir(parents=True, exist_ok=True)
 
+    # Invalidate cached config + services so the new values take effect immediately
+    from zerobox.api.dependencies import reload_config
+
+    reload_config()
+
     return {"status": "ok", "config_path": str(config_path)}

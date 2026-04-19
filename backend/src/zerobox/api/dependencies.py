@@ -65,3 +65,27 @@ def get_pipeline() -> PipelineService:
     return PipelineService(
         get_intake(), get_ocr(), get_classifier(), get_filemanager(), get_audit()
     )
+
+
+_CACHED_GETTERS = (
+    get_config,
+    get_audit,
+    get_intake,
+    get_ocr,
+    get_rules,
+    get_provider,
+    get_classifier,
+    get_filemanager,
+    get_pipeline,
+)
+
+
+def reload_config() -> None:
+    """Invalidate every cached getter so the next call rebuilds from `config.json` / `.env`.
+
+    Call this after `config.json` or `.env` is written (e.g. from the wizard's
+    `/setup/save` handler) so subsequent `/config` reads and pipeline calls
+    reflect the new values without a process restart.
+    """
+    for getter in _CACHED_GETTERS:
+        getter.cache_clear()

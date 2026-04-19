@@ -199,3 +199,27 @@ class TestSaveConfig:
 
         env = (tmp_path / ".env").read_text()
         assert "OLLAMA_BASE_URL=http://myhost:11434" in env
+
+    def test_save_makes_get_config_reflect_new_values(self, client, tmp_path):
+        """Regression test for #72: wizard save must invalidate the cached
+        config so the next /config (and pipeline services) see the new values,
+        not the defaults captured at startup."""
+        resp = client.post(
+            "/setup/save",
+            json={
+                "input_folder": str(tmp_path / "inbox"),
+                "output_root": str(tmp_path / "archive"),
+                "profiles_dir": str(tmp_path / "profiles"),
+                "language": "deu+eng+rus",
+                "provider": "anthropic",
+                "api_key": "sk-ant-test",
+            },
+        )
+        assert resp.status_code == 200
+
+        config_resp = client.get("/config")
+        assert config_resp.status_code == 200
+        config = config_resp.json()
+        assert config["ocr"]["language"] == "deu+eng+rus"
+        assert config["filemanager"]["output_root"].endswith("archive")
+        assert config["intake"]["input_folder"].endswith("inbox")
