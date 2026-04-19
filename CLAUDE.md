@@ -50,4 +50,5 @@ When releasing a new version:
 `1.` Update version in all manifests (`backend/pyproject.toml`, `frontend/package.json`, `frontend/src-tauri/Cargo.toml`, `frontend/src-tauri/tauri.conf.json`)
 `2.` Create an annotated Git tag (`git tag -a vX.Y.Z`)
 `3.` Build installers via `scripts/build-installer.ps1`
-`4.` Create a GitHub Release with the installer artifacts (MSI + NSIS) attached
+`4.` Build the docs bundle via `scripts/build-docs-bundle.ps1` (produces `docs.zip`)
+`5.` Create a GitHub Release with the installer artifacts (MSI + NSIS) **and** `docs.zip` attached

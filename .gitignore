@@ -19,6 +19,8 @@ build/
 out/
 target/
 *.spec
+docs.zip
+.docs-bundle-staging/
 
 # Tauri sidecar binaries (generated/placeholder)
 frontend/src-tauri/binaries/*.exe
