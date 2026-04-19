@@ -190,6 +190,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#100`: Drop `docs.zip` release artifact, link docs from release notes
+**Request:** After `#98` made the docs available inside the app, the `docs.zip` artifact introduced by `#92` became redundant. Remove it; use tag-pinned doc links in the release notes where that's actually useful.
+**Done:** Deleted `scripts/build-docs-bundle.(ps1|sh)`, cleaned the `docs.zip`/`.docs-bundle-staging/` entries from `.gitignore`, removed the "Docs Bundle (release artifact)" section from `docs/dev-testing.md`, and collapsed `CLAUDE.md`'s versioning steps `4`+`5` back to a single step `4` that uploads only the installer artifacts while embedding a **Documentation** section (tag-pinned `/docs/*.md` + `/README.md` links) in the release notes. `v0.4.0`'s `docs.zip` stays attached to that release as a historical artifact — no retroactive deletion.
+**Result:** `#100` closed via PR `#101`.
+
 ### `2026-04-19` — `#98`: In-app Help tab with rendered, bundled docs (`IDEA-13` phase 2)
 **Request:** "Bring the docs into the application — that was actually what I meant by 'ship with'." Implement formatted, in-app access to the docs.
 **Done:** Added a fifth tab `Help` to the main app. Sidebar lists User Guide, README, Architecture, Dev Testing, Roadmap; right pane renders the selected `.md` with `marked` (parser) + `dompurify` (sanitiser). New `frontend/scripts/sync-docs.mjs` copies the repo's `.md` files into `frontend/public/docs/` so Vite bundles them into `dist/` and Tauri into the installer; hooked into `predev` / `prebuild`, plus standalone `npm run sync-docs` and a smoke test `npm run test:sync-docs`. `frontend/public/docs/` is git-ignored (derived artefact). `marked` + `dompurify` added as prod deps. Frontend bundle grew from `~78 KB` to `~143 KB` JS — acceptable for a desktop app. `docs/user-guide.md` ("five tabs", new Help section) and `docs/dev-testing.md` (new In-App Docs Sync section) updated per the keep-current rule. Deliberately did **not** add Vitest / svelte-testing-library — too much new test infra for one component; smoke test guards the build-time sync, which is the most fragile piece.
