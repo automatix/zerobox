@@ -190,6 +190,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#108`: Fix pre-existing `svelte-check` type errors in `SetupWizard.svelte`
+**Request:** Patch the three `svelte-check` errors that surfaced during `#106` (`depStatus` narrowing + `step === 'ocr'` literal-type comparison).
+**Done:** Root cause: Svelte `5`'s `$state()` infers the literal type from its argument, so `let step: Step = $state('provider')` narrows `step` to `'provider'` (left-hand annotation doesn't widen it in `svelte-check`'s view). Switched both problem declarations to the explicit generic form: `let step = $state<Step>('provider')` and `let depStatus = $state<DepStatus | null>(null)`. `npm run check` now reports `0` errors / `0` warnings. No behavioural change.
+**Result:** `#108` in progress via branch `bugfix/108-svelte-check-state-narrowing`.
+
 ### `2026-04-19` — `#106`: First-Run-Wizard — hide Back button on Step `1` (Provider)
 **Request:** On Step `1` of the First-Run-Wizard the Back button in the lower-left footer is superfluous (there is no previous step). Remove it. Patch-level fix.
 **Done:** In `frontend/src/views/SetupWizard.svelte`, gated the Back button behind `{#if step !== 'provider'}` with an empty `<div>` placeholder on the else branch so the footer's `justify-between` keeps Next right-aligned. Dropped the now-redundant `disabled={step === 'provider'}` attribute and the associated `disabled:` utility classes since Back only renders when it's actionable. No doc / test updates needed (no reference to the Back button in `docs/user-guide.md`, no frontend tests for the wizard). Noticed 3 pre-existing svelte-check type errors in `SetupWizard.svelte` (`depStatus` narrowing, `step === 'ocr'` comparison) — not introduced by this patch; flagged for a separate ticket.
