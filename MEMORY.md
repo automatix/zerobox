@@ -141,6 +141,21 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architec
 **Decision:** Hybrid layout. `config.json` and `.env` live in an OS-conventional per-user config directory: `%APPDATA%\zerobox\` on Windows, `~/Library/Application Support/zerobox/` on macOS, `$XDG_CONFIG_HOME/zerobox/` (fallback `~/.config/zerobox/`) on Linux. The env var `ZEROBOX_CONFIG_DIR` overrides for dev/tests. Final fallback: `~/.zerobox/`. Data folders (inbox, archive/output, profiles, audit DB) remain freely configurable via `config.json` — no change there.
 **Rationale:** OS standard (Windows Roaming-`AppData`, XDG spec, macOS Application Support). Multi-user friendly. Survives re-installs and updates. No admin rights needed (unlike `Program Files\`). Installer builds never have to write next to the exe. Single source of truth via `zerobox.paths.config_dir` so every consumer — `load_config`, `AppConfig` `.env`-file resolution, the wizard's `/setup/save` + `/setup/status` — sees the same directory. Supersedes the previous `Path.cwd()` (dev) / `Path(sys.executable).parent` (frozen) behaviour, which was fragile and required admin rights in installer builds. Ticket `#80`.
 
+### `DD-08` — Resource ID Handling on Create (`2026-04-19`)
+**Decision:** `POST /rules/profiles` and `POST /rules/profiles/{id}/rules` accept `id` **optionally** in the request body. When omitted, the server generates one (slugified `name` for profiles, short `uuid4` for rules). Explicit ids in the body are honoured. We do **not** introduce a separate `PUT /rules/profiles/{id}` upsert endpoint at this time.
+**Pros:**
+- One endpoint covers both the common "let the server name it" case and the rarer "I have my own id" case (imports, backups, scripted profile management, idempotency on retry).
+- Minimal surface area: one route per resource collection instead of two (`POST` + `PUT`).
+- Backwards-compatible — existing callers that send an `id` keep working unchanged.
+- Matches current frontend usage with no client changes required.
+**Cons:**
+- Not strict REST. By convention `POST /collection` lets the server assign the id; client-supplied ids belong on `PUT /collection/{id}` (idempotent upsert with id in URL path). Mixing both shapes on `POST` blurs the contract.
+- Schema is more permissive: clients have to know "id is optional but accepted", which is harder to discover than two endpoints with separate purposes.
+- Conflict semantics are split: explicit-id path returns `409 Conflict`, slug-generated path silently dedupes with `-2` suffix. A single endpoint with two behaviours.
+- Postpones the cleaner design instead of making it; technical debt.
+**When to revisit:** When we add bulk import / backup-restore, when client-side offline mode (`IDEA-01` / `IDEA-04`) actually lands, or when we externalise the API beyond the in-app frontend. Tracked in `IDEA-14`.
+**Tickets:** `#86` (the original 422 fix that produced this state), `IDEA-14` (proposal to revisit).
+
 ### `DD-04` — Architecture (`2026-04-13`)
 **Decision:** Modular service architecture with `9` modules, LLM provider abstraction, dependency injection, FastAPI backend as Tauri sidecar.
 **Rationale:** See `docs/architecture.md` for the full living document.
@@ -169,6 +184,7 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 - `IDEA-11` — **Folder picker in Wizard** — replace the free-text folder inputs (`input_folder`, `output_root`, `profiles_dir`) in the Folders step with a native folder-browse button (Tauri `dialog.open({ directory: true })`). Falls back to the current text input when running in a plain browser (Vite dev without Tauri shell). Reduces typos and makes path selection discoverable.
 - `IDEA-12` — **Editable Settings tab** — `frontend/src/views/Settings.svelte` currently renders the live config read-only ("Edit the config file directly to make changes."). Make it editable: per-section forms backed by the same Pydantic schema as `config.json` / the wizard, validation client- and server-side, a `PATCH /config` (or `PUT /setup/save`-equivalent) endpoint to persist, and a clear "save" / "reset" workflow. Cover both `config.json` fields and the secrets in `.env` (with masked input).
 - `IDEA-13` — **Ship documentation with the release** — bundle both end-user docs (`README.md`) and technical/dev docs (`docs/architecture.md`, `docs/dev-testing.md`, `docs/roadmap.md`, Postman collection) with the installer/release artifacts. Options to explore: (a) static HTML rendered from the Markdown at build time and bundled as Tauri resources, surfaced via an in-app "Help" tab; (b) a `docs.zip` attached alongside the MSI/NSIS on the GitHub Release; (c) both. Keep the single source of truth in the repo's `.md` files; rendering happens at build time.
+- `IDEA-14` — **Revisit REST shape of resource creation** — current state (per `DD-08`) is pragmatic: `POST /rules/profiles` accepts an optional `id` in the body and generates one when absent. The strict-REST alternative would be `POST /rules/profiles {name, description}` (server always assigns the id, returned in the response and `Location` header) plus `PUT /rules/profiles/{id} {...}` as an idempotent upsert for the rarer "I want this exact id" case (imports, backups, sync). Decide in the context of: (a) whether bulk import / restore lands (`IDEA-04` rule sharing), (b) whether the API is consumed by anything beyond the in-app frontend, (c) whether client-side offline mode (`IDEA-01`) needs client-generated UUIDs. Apply the same shape to `/rules/profiles/{id}/rules` for consistency. Touches: backend route schemas + handlers, Postman collection, BDD scenarios, frontend API client.
 
 ---
 
