@@ -169,6 +169,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#72`: Wizard-saved settings invisible in Settings tab (stale config cache)
+**Request:** Bug report — values entered in the First-Run-Wizard didn't show up under Settings, only defaults were displayed.
+**Done:** Diagnosed: `/config` returned the closure-captured `AppConfig` from `create_app()`, and `dependencies.get_config()` plus all downstream service getters were `@lru_cache`'d — so the wizard's `config.json` write was on disk but the running backend kept serving startup defaults (uvicorn `--reload` only watches `.py`). Added `reload_config()` helper in `dependencies.py` that clears every cached getter; `setup.save_config` calls it after writing `config.json` + `.env`; `/config` delegates to the (now invalidatable) cached getter. `3` new unit tests, `186` total green. Live-verified against the running dev backend.
+**Result:** `#72` closed via PR `#73`. Settings now reflects wizard input; pipeline services pick up new config without process restart. Side-finding: `/config` exposes API keys in cleartext — tracked separately in `#74`.
+
 ### `2026-04-19` — `#70`: Untrack `.claude/settings.local.json`
 **Request:** Stop the recurring auto-appends to `settings.local.json` from blocking `gh pr merge`'s post-merge auto-pull.
 **Done:** `git rm --cached .claude/settings.local.json` (file stays on disk) and added the path to `.gitignore`. Project-level shared permissions remain in `.claude/settings.json`; the `.local` variant is by convention machine-specific.
