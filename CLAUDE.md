@@ -40,6 +40,8 @@ When the user gives a directive that references multiple items and mentions para
 
 Whenever the assistant decides to deviate from any instruction (`CLAUDE.md`, user message, documented process, e.g. the release procedure in `Versioning`), the deviation must be **explicit and visible** in the user-facing response: name what is being skipped or changed and why. The default is to **ask before deviating** — explain the proposed exception and let the user decide. Silent omissions, shortcuts, or "I'll skip this since it seems fine" are not acceptable.
 
+After every change, update the **tests** and the **documentation** to match. Keep them continuously current — no PR leaves a behaviour or user-surface change without matching test updates *and* matching doc updates (`README.md`, `docs/user-guide.md`, `docs/architecture.md`, `docs/dev-testing.md`, `docs/roadmap.md`, `MEMORY.md`, Postman collection, Gherkin features — whichever the change actually touches). Pure internal refactors with no behaviour change must still keep tests green; doc updates only become necessary when something a reader of the docs would notice has changed.
+
 ## Versioning
 
 This project uses Semantic Versioning (`semver.org`). After each commit, evaluate whether a new version release is warranted. Announce version bumps with a brief rationale (patch / minor / major).
