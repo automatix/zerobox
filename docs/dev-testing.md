@@ -61,6 +61,26 @@ curl -X POST http://localhost:8000/setup/save \
 
 Delete `config.json` from the per-user config directory (see above) to trigger the wizard again on next page load. For selective or scripted resets, prefer the dev-uninstall CLI below.
 
+## In-App Docs Sync
+
+The Help tab renders the repo's `.md` docs from inside the app. To make that work without runtime network access, `frontend/scripts/sync-docs.mjs` copies `README.md` and the user-facing/technical files under `docs/` into `frontend/public/docs/` so Vite bundles them into `dist/` and Tauri bundles `dist/` into the installer.
+
+The script runs automatically before `npm run dev` and `npm run build` (via `predev` / `prebuild` hooks). To run it manually:
+
+```bash
+cd frontend
+npm run sync-docs
+```
+
+Smoke test (asserts every expected file lands in `frontend/public/docs/`):
+
+```bash
+cd frontend
+npm run test:sync-docs
+```
+
+`frontend/public/docs/` is git-ignored — the synced copies are derived artefacts, never committed. If you change the list of bundled docs, edit the `files` array in `frontend/scripts/sync-docs.mjs` and the `expected` array in `frontend/scripts/sync-docs.test.mjs`, and the `docs` array in `frontend/src/views/HelpTab.svelte`.
+
 ## Docs Bundle (release artifact)
 
 Part of the release process: `scripts/build-docs-bundle.(ps1|sh)` creates `docs.zip` in the repo root containing the end-user docs (`README.md`, `docs/user-guide.md`) plus the technical/dev docs (`docs/architecture.md`, `docs/dev-testing.md`, `docs/roadmap.md`, `docs/postman/`). The zip is attached to the GitHub Release alongside the MSI/NSIS installers so downstream users have offline documentation without cloning the repo.
