@@ -38,6 +38,8 @@ Maintain ticket status via labels: `status:ready` (new/backlog), `status:in-prog
 
 When the user gives a directive that references multiple items and mentions parallelism (e.g. `"Mach beides. Gerne parallel."`, `"Löse beides"`, `"X, gerne parallel"`), the default is to **implement** them, not just to create tickets. Only file a ticket without implementing when the user explicitly says `"nur anlegen"` / `"nur ticketen"` / similar, or when an architectural decision requires user input — in which case ask before silently deferring.
 
+Whenever the assistant decides to deviate from any instruction (`CLAUDE.md`, user message, documented process, e.g. the release procedure in `Versioning`), the deviation must be **explicit and visible** in the user-facing response: name what is being skipped or changed and why. The default is to **ask before deviating** — explain the proposed exception and let the user decide. Silent omissions, shortcuts, or "I'll skip this since it seems fine" are not acceptable.
+
 ## Versioning
 
 This project uses Semantic Versioning (`semver.org`). After each commit, evaluate whether a new version release is warranted. Announce version bumps with a brief rationale (patch / minor / major).
