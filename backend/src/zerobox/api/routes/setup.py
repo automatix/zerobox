@@ -71,10 +71,10 @@ class SaveConfigRequest(BaseModel):
 # ---------------------------------------------------------------------------
 
 def _config_dir() -> Path:
-    """Return the directory where config.json and .env live."""
-    if getattr(sys, "frozen", False):
-        return Path(sys.executable).parent
-    return Path.cwd()
+    """Return the directory where config.json and .env live (see DD-07)."""
+    from zerobox.paths import config_dir
+
+    return config_dir()
 
 
 def _resources_dir() -> Path | None:
@@ -226,6 +226,7 @@ async def validate_setup(req: ValidateRequest) -> ValidateResponse:
 async def save_config(req: SaveConfigRequest) -> dict[str, str]:
     """Write config.json and .env based on wizard input."""
     base = _config_dir()
+    base.mkdir(parents=True, exist_ok=True)
 
     # Build config.json
     config_data = {

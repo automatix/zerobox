@@ -1,4 +1,9 @@
-"""Centralized configuration using pydantic-settings (FR-07)."""
+"""Centralized configuration using pydantic-settings (FR-07).
+
+Config and secrets live in an OS-conventional per-user directory (see
+`zerobox.paths`, `DD-07`). Data folders (inbox, archive, profiles,
+audit DB) continue to follow whatever `config.json` specifies.
+"""
 
 import json
 from pathlib import Path
@@ -6,6 +11,8 @@ from typing import Literal
 
 from pydantic import BaseModel, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from zerobox.paths import config_file, env_file
 
 
 def _expand(v: str | Path | None) -> Path | None:
@@ -95,15 +102,23 @@ def load_config(config_path: Path | None = None) -> AppConfig:
     """Load configuration from a JSON file, falling back to defaults.
 
     Values from ``config.json`` are merged with environment variables and
-    ``.env`` secrets.  Keys not present in the file keep their defaults.
+    ``.env`` secrets. Keys not present in the file keep their defaults.
+
+    By default the config and `.env` paths resolve via
+    :func:`zerobox.paths.config_file` / :func:`zerobox.paths.env_file` —
+    an OS-conventional per-user location (or `$ZEROBOX_CONFIG_DIR` when
+    set). Callers may override `config_path` explicitly (tests, scripts).
     """
     overrides: dict = {}
 
     if config_path is None:
-        config_path = Path("config.json")
+        config_path = config_file()
 
     if config_path.exists():
         with open(config_path, encoding="utf-8") as f:
             overrides = json.load(f)
 
-    return AppConfig(**overrides)
+    env_path = env_file()
+    init_kwargs = {"_env_file": str(env_path)} if env_path.exists() else {}
+
+    return AppConfig(**init_kwargs, **overrides)

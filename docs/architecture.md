@@ -241,6 +241,22 @@ class AuditEntry:
 
 ## Configuration
 
+### Storage location (`DD-07`)
+
+`config.json` and `.env` live in an OS-conventional per-user directory:
+
+| Platform | Path |
+|---|---|
+| Windows | `%APPDATA%\zerobox\` |
+| macOS | `~/Library/Application Support/zerobox/` |
+| Linux | `$XDG_CONFIG_HOME/zerobox/` (fallback: `~/.config/zerobox/`) |
+| All | `$ZEROBOX_CONFIG_DIR` wins if set (dev / test override) |
+| Fallback | `~/.zerobox/` |
+
+Data folders (inbox, archive/output, profiles, audit DB) remain freely configurable via `config.json`'s respective keys.
+
+Implemented in `backend/src/zerobox/paths.py` (`config_dir`, `config_file`, `env_file`). Used by `config.load_config` and `api.routes.setup._config_dir`.
+
 ### `config.json` — settings with defaults
 
 ```jsonc

@@ -85,7 +85,7 @@ class TestLoadConfigExpansion:
     ) -> None:
         """Regression for #75: every Path field with `~` must be expanded
         on load, so consumers never see literal `~` paths."""
-        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv("ZEROBOX_CONFIG_DIR", str(tmp_path))
         (tmp_path / "config.json").write_text(
             json.dumps(
                 {
