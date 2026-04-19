@@ -174,6 +174,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#88`: Release `v0.3.1` (patch — bundle `#86`)
+**Request:** Ship a patch release for the profile-creation fix.
+**Done:** Bumped `0.3.0` → `0.3.1` in all manifests + `App.svelte` header. Tag `v0.3.1` pushed. Installer build produced MSI + NSIS; both attached to the GitHub Release.
+**Result:** `#88` closed via PR `#89`. Release: https://github.com/automatix/zerobox/releases/tag/v0.3.1
+
 ### `2026-04-19` — `#86`: Rule-Profile creation returns `422`
 **Request:** Bug report — creating a profile in the UI fails with `API error: 422` (screenshot showed `Dummy` / `Dummy profile` input).
 **Done:** Root cause: `CreateProfileBody.id` (and `AddRuleBody.id`) were required, but the frontend forms only send `{name, description}` / `{patterns, ...}` — pydantic rejected at the schema boundary. Made both ids optional; backend now auto-generates. Profile id = slugified name (lowercase, non-alphanum → `-`, collapse, strip, `-2`/`-3`/… on collision, falls back to `uuid4().hex[:8]` when the slug would be empty). Rule id = `uuid4().hex[:8]` deduped against the profile. `add_rule` now `get_profile`s before generating an id so missing profiles surface as `404`. Explicit ids still honoured. `7` new unit tests; `225` total green. Live `curl` confirmed `201 {"id":"dummy",...}`.
