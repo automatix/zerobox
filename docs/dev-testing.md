@@ -28,7 +28,7 @@ Open `http://localhost:5173` in the browser.
 
 - On first launch (no `config.json` with `setup_complete: true`), the **First-Run-Wizard** appears.
 - The wizard walks through: LLM Provider → Folders → OCR → Summary.
-- After completing the wizard, `config.json` and `.env` are written to the backend working directory.
+- After completing the wizard, `config.json` and `.env` are written to the per-user config directory (Windows: `%APPDATA%\zerobox\`, macOS: `~/Library/Application Support/zerobox/`, Linux: `$XDG_CONFIG_HOME/zerobox/` or `~/.config/zerobox/`). Override with `ZEROBOX_CONFIG_DIR`. See `DD-07`.
 - Subsequent launches skip the wizard and show the main app (Review, Rule Profiles, Audit Log, Settings).
 
 ## Full desktop mode (Tauri shell)
@@ -59,4 +59,57 @@ curl -X POST http://localhost:8000/setup/save \
 
 ## Resetting the wizard
 
-Delete `config.json` in the backend directory to trigger the wizard again on next page load.
+Delete `config.json` from the per-user config directory (see above) to trigger the wizard again on next page load. For selective or scripted resets, prefer the dev-uninstall CLI below.
+
+## Dev-Uninstall / Reset
+
+Wipe zerobox state selectively to retest the First-Run-Wizard or pipeline from a clean slate. Reads the current `config.json` (if present) so user-configured paths are honoured.
+
+### Usage
+
+PowerShell wrapper:
+
+```powershell
+scripts/dev-uninstall.ps1 [flags]
+```
+
+Bash wrapper:
+
+```bash
+scripts/dev-uninstall.sh [flags]
+```
+
+Or directly as a Python module:
+
+```bash
+cd backend
+python -m zerobox.dev_uninstall [flags]
+```
+
+### Flags
+
+| Flag | Effect |
+|---|---|
+| `--all` | Wipe every target below. |
+| `--config` | Delete `config.json` (wizard settings). |
+| `--env` | Delete `.env` (API keys). |
+| `--data-inbox` | Delete the intake input folder. |
+| `--data-output` | Delete the archive/output folder. |
+| `--profiles` | Delete the rule profiles directory. |
+| `--audit` | Delete `audit.db`. |
+| `--yes` / `-y` | Skip the final confirmation prompt. |
+
+With no flags the script enters **interactive mode** and asks `y/N` for each target. The script always prints a plan of what will be deleted before proceeding, and exits non-zero if any deletion fails.
+
+### Examples
+
+```bash
+# Nuke everything (with confirmation)
+scripts/dev-uninstall.sh --all
+
+# Just reset the wizard (keeps data)
+scripts/dev-uninstall.ps1 --config --env --yes
+
+# Interactive
+scripts/dev-uninstall.sh
+```
