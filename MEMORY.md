@@ -169,6 +169,21 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#78`: Release `v0.2.1` (patch — bundle `#68` + `#72` + `#74` + `#75`)
+**Request:** Bundle the four post-`v0.2.0` fixes into a patch release following the full documented procedure.
+**Done:** Bumped version `0.2.0` → `0.2.1` in all manifests (`backend/pyproject.toml`, `app.py` FastAPI title, frontend `package.json` + lockfile, `Cargo.toml` + `Cargo.lock`, `tauri.conf.json`, `App.svelte` header). Tag `v0.2.1` created and pushed. Installer build via `scripts/build-installer.ps1` produced MSI + NSIS; both attached to the GitHub Release. Release notes consolidated `#68`, `#72`, `#74`, `#75`.
+**Result:** `#78` closed via PR `#79`. Release: https://github.com/automatix/zerobox/releases/tag/v0.2.1
+
+### `2026-04-19` — `#75`: Expand `~` in all path fields
+**Request:** Bug report — wizard creates a literal `~` directory in the project root because the `~` in user-entered paths is not expanded.
+**Done:** Diagnosed: `setup.py:save_config` called `Path(folder).mkdir()` without `.expanduser()`, and `config.py` only expanded `profiles_dir` (not `intake.input_folder`, `filemanager.output_root`, `audit.db_path`, or the optional `OcrConfig.tesseract_path` / `ghostscript_path`). Added `field_validator(mode="before")` to every `Path` field via a shared `_expand` helper; `setup.save_config` now `.expanduser()`s before `mkdir`. Cleaned up the leftover `backend/~/` tree. `8` new unit tests, `194` total green. Live verified.
+**Result:** `#75` closed via PR `#76`.
+
+### `2026-04-19` — `#74`: Mask API keys in `/config` via `SecretStr`
+**Request:** Security finding from `#72` — `/config` exposes raw API keys after the cache invalidation made the in-memory `.env` values visible.
+**Done:** Switched `AppConfig.{anthropic_api_key, openai_api_key}` from `str` to `SecretStr`. `model_dump()` now serializes them as `'**********'`; `repr()` and `str()` are masked too. No consumer updates needed — the fields were never read by any code; the Anthropic provider reads `ANTHROPIC_API_KEY` directly from `os.environ`. `4` new unit tests, `198` total green. Live verified — `/config` returns `**********` (was a real `sk-ant-…`).
+**Result:** `#74` closed via PR `#77`. Recommendation chosen: `SecretStr` over `model_dump(exclude=…)` because it is default-safe at the type level (every future endpoint inherits the masking), protects against repr/log/stack-trace leaks, and the consumer-update cost was zero.
+
 ### `2026-04-19` — `#72`: Wizard-saved settings invisible in Settings tab (stale config cache)
 **Request:** Bug report — values entered in the First-Run-Wizard didn't show up under Settings, only defaults were displayed.
 **Done:** Diagnosed: `/config` returned the closure-captured `AppConfig` from `create_app()`, and `dependencies.get_config()` plus all downstream service getters were `@lru_cache`'d — so the wizard's `config.json` write was on disk but the running backend kept serving startup defaults (uvicorn `--reload` only watches `.py`). Added `reload_config()` helper in `dependencies.py` that clears every cached getter; `setup.save_config` calls it after writing `config.json` + `.env`; `/config` delegates to the (now invalidatable) cached getter. `3` new unit tests, `186` total green. Live-verified against the running dev backend.
