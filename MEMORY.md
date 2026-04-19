@@ -168,6 +168,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-04-19` — `#65` + `#66`: Catch up `v0.2.0` release artifacts and codify deviation-transparency rule
+**Request:** (a) Run the missed steps `3`–`4` of the documented release process for `v0.2.0` (build installers + attach to release). (b) Codify a new rule: any deviation from a documented instruction must be explicit and visible, ideally asked about first.
+**Done:** `#65` — Ran `scripts/build-installer.ps1` (after correcting `pwsh` → `powershell` since PowerShell Core is not installed). PyInstaller built `zerobox-backend-x86_64-pc-windows-msvc.exe`, then `npm run tauri build` produced `Zerobox_0.2.0_x64_en-US.msi` (MSI) and `Zerobox_0.2.0_x64-setup.exe` (NSIS). Both uploaded to the existing `v0.2.0` GitHub Release; release notes updated. `#66` — Added a deviation-transparency paragraph to the `Interaction` section of project `CLAUDE.md`, mirrored in the user's global `CLAUDE.md` and in `feedback_make_deviations_explicit.md` in the session auto-memory.
+**Result:** `#65` and `#66` closed via PRs `#67` (`#66`) and direct release work (`#65`). Release `v0.2.0` is now complete with installer artifacts.
+
 ### `2026-04-18` — `#62`: Bump version to `0.2.0` + GitHub Release
 **Request:** Align/catch up versioning across all manifests after the session's accumulated work.
 **Done:** Minor bump `0.1.1` → `0.2.0` in `backend/pyproject.toml`, `backend/src/zerobox/app.py` (FastAPI title), `frontend/package.json` + `package-lock.json`, `frontend/src-tauri/{Cargo.toml, Cargo.lock, tauri.conf.json}`, and the `App.svelte` header display. Annotated tag `v0.2.0` created and pushed. GitHub Release published with collated highlights. Installer artifacts not attached — can be built locally via `scripts/build-installer.ps1` and uploaded later.
