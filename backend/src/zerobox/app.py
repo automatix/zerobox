@@ -16,7 +16,7 @@ ALLOWED_ORIGINS = [
 
 def create_app() -> FastAPI:
     config = load_config()
-    app = FastAPI(title="zerobox", version="0.3.1")
+    app = FastAPI(title="zerobox", version="0.4.0")
     app.state.config = config
     app.state.proposals: dict[str, dict] = {}
 
