@@ -1,24 +1,76 @@
 # Dev Testing Notes
 
+## Prerequisites
+
+System-level tools that must be installed before running zerobox from source (none of these are bundled by `pip` / `npm`):
+
+| Tool | Version | Purpose |
+|---|---|---|
+| Python | `3.13`+ | Backend runtime |
+| Node.js | `20`+ | Frontend build + dev server |
+| Rust toolchain | stable | Building the Tauri shell (only needed for `cargo tauri dev` / installer builds) |
+| Tesseract OCR | `5`+ | Text extraction (invoked by `ocrmypdf`) |
+| Ghostscript | `10`+ | PDF processing (invoked by `ocrmypdf`) |
+
+All Python packages — including `uvicorn`, `fastapi`, `ocrmypdf`, `anthropic`, `openai`, `pytest`, `ruff` — are installed automatically by `pip install -e ".[dev]"` and do **not** need to be installed separately. The same applies to the installed end-user build: the Windows installer (MSI/NSIS) bundles the backend (including `uvicorn`) as a standalone PyInstaller executable, so end users only need Tesseract and Ghostscript on their system.
+
 ## Running Zerobox in Dev Mode (without installer)
 
 Two terminals needed:
 
 ### Terminal 1 — Backend
 
+**One-time setup** (per clone):
+
 ```bash
 cd backend
-pip install -e ".[dev]"
+python -m venv .venv                 # creates the venv directory
+source .venv/Scripts/activate        # see the activation table below
+pip install -e ".[dev]"              # installs uvicorn, fastapi, pytest, ruff, …
+```
+
+**Every session** (each time you start the backend):
+
+```bash
+cd backend
+source .venv/Scripts/activate        # activate the existing venv
 uvicorn zerobox.app:create_app --factory --reload
 ```
 
+**Re-run `pip install -e ".[dev]"`** only when `backend/pyproject.toml` dependencies change (git pull brings new deps, you add a package, etc.). `python -m venv .venv` is never repeated unless you delete the `.venv` directory.
+
 API available at `http://localhost:8000` (Swagger UI at `/docs`).
 
+#### venv activation by shell
+
+| Shell | Activate command |
+|---|---|
+| Git Bash (Windows) | `source .venv/Scripts/activate` |
+| PowerShell (Windows) | `.venv\Scripts\Activate.ps1` |
+| `cmd.exe` (Windows) | `.venv\Scripts\activate.bat` |
+| bash / zsh (Linux/macOS) | `source .venv/bin/activate` |
+
+Your prompt should change to show `(.venv)` once active. Run `deactivate` to leave the venv.
+
+> **PATH-safe alternative.** If `uvicorn: command not found` appears despite a successful install (typical on Windows when no venv is used and the user-site `Scripts/` directory isn't on `PATH`), run the server via the Python module instead — this always works:
+>
+> ```bash
+> python -m uvicorn zerobox.app:create_app --factory --reload
+> ```
+
 ### Terminal 2 — Frontend
+
+**One-time setup** (per clone, and whenever `frontend/package.json` dependencies change):
 
 ```bash
 cd frontend
 npm install
+```
+
+**Every session:**
+
+```bash
+cd frontend
 npm run dev
 ```
 
@@ -35,10 +87,12 @@ Open `http://localhost:5173` in the browser.
 
 ```bash
 cd frontend
-cargo tauri dev
+npm run tauri -- dev
 ```
 
-This starts both the backend sidecar and the Tauri WebView window. In dev mode (`debug_assertions`), the backend is **not** auto-started by Tauri — you must run it manually in Terminal 1.
+This uses the `@tauri-apps/cli` devDependency already installed by `npm install` — no extra global install required. `cargo tauri dev` works equivalently but only if you've run `cargo install tauri-cli` beforehand.
+
+Either command starts both the backend sidecar and the Tauri WebView window. In dev mode (`debug_assertions`), the backend is **not** auto-started by Tauri — you must run it manually in Terminal 1.
 
 ## Testing the setup endpoints directly
 
