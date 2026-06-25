@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 from fastapi.testclient import TestClient
 
-from zerobox.api.routes.setup import _find_executable, _run_mode
+from zerobox.api.routes.setup import _find_executable
 from zerobox.app import create_app
 
 
@@ -112,41 +112,6 @@ class TestGetStatus:
         resp = client.get("/setup/status")
         data = resp.json()
         assert data["setup_complete"] is True
-
-
-class TestRunMode:
-    """`run_mode` detection for the dev-vs-installer wizard context (#52)."""
-
-    def test_defaults_to_dev_when_not_frozen(self, monkeypatch):
-        monkeypatch.delenv("ZEROBOX_RUN_MODE", raising=False)
-        monkeypatch.setattr("zerobox.api.routes.setup.sys.frozen", False, raising=False)
-        assert _run_mode() == "dev"
-
-    def test_frozen_means_installer(self, monkeypatch):
-        monkeypatch.delenv("ZEROBOX_RUN_MODE", raising=False)
-        monkeypatch.setattr("zerobox.api.routes.setup.sys.frozen", True, raising=False)
-        assert _run_mode() == "installer"
-
-    def test_env_override_forces_installer(self, monkeypatch):
-        monkeypatch.setenv("ZEROBOX_RUN_MODE", "installer")
-        monkeypatch.setattr("zerobox.api.routes.setup.sys.frozen", False, raising=False)
-        assert _run_mode() == "installer"
-
-    def test_env_override_forces_dev(self, monkeypatch):
-        monkeypatch.setenv("ZEROBOX_RUN_MODE", "dev")
-        monkeypatch.setattr("zerobox.api.routes.setup.sys.frozen", True, raising=False)
-        assert _run_mode() == "dev"
-
-    def test_invalid_env_override_is_ignored(self, monkeypatch):
-        monkeypatch.setenv("ZEROBOX_RUN_MODE", "bogus")
-        monkeypatch.setattr("zerobox.api.routes.setup.sys.frozen", False, raising=False)
-        assert _run_mode() == "dev"
-
-    def test_status_reports_run_mode(self, client, monkeypatch):
-        monkeypatch.setenv("ZEROBOX_RUN_MODE", "installer")
-        resp = client.get("/setup/status")
-        assert resp.status_code == 200
-        assert resp.json()["run_mode"] == "installer"
 
 
 class TestValidate:

@@ -98,7 +98,6 @@ export const api = {
     setup_complete: boolean;
     has_config: boolean;
     has_env: boolean;
-    run_mode: 'dev' | 'installer';
     tesseract_available: boolean;
     tesseract_path: string | null;
     ghostscript_available: boolean;
