@@ -36,10 +36,10 @@ See [`docs/architecture.md`](docs/architecture.md) for the full architecture doc
 
 Download the latest installer from the [Releases](https://github.com/automatix/zerobox/releases) page. Available formats:
 
-- **MSI** — standard Windows Installer package
-- **NSIS** — executable installer
+- **NSIS** (`…_x64-setup.exe`) — **recommended.** During setup it detects the OCR tools and, if **Tesseract** or **Ghostscript** are missing, offers to download and install them for you (system-wide or as a portable copy next to zerobox). They are fetched from their upstream projects on your machine — they are not redistributed inside the installer.
+- **MSI** (`…_x64_en-US.msi`) — plain Windows Installer package, intended for managed / enterprise deployment (e.g. Group Policy). It does **not** offer to install the OCR tools; install Tesseract and Ghostscript yourself (see [Prerequisites](#prerequisites)).
 
-The installer bundles the backend and frontend. The OCR tools **Tesseract** and **Ghostscript** are not bundled (Ghostscript is AGPL-licensed) — install them separately, see [Prerequisites](#prerequisites).
+Either installer bundles the backend and frontend. The OCR tools are never bundled into the artifact (Ghostscript is AGPL-licensed); the First-Run-Wizard verifies both are present and points you to the install steps if not.
 
 ### Configuration
 

@@ -166,7 +166,8 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architec
 ### `DD-10` — OCR Tools Are Prerequisites, Not Bundled (`2026-06-25`)
 **Decision:** zerobox does **not** bundle Tesseract or Ghostscript. They are documented user-installed prerequisites (checked by the wizard via `/setup/status`). The PyInstaller backend + Tauri shell remain bundled.
 **Rationale:** **Ghostscript is AGPL-3.0** — redistributing it in the installer would impose AGPL obligations on the distributed product (project owner's decision to avoid). Tesseract (Apache-2.0) is left as a prerequisite too for a consistent, honest story. Revises `DD-06` (bundling, whose OCR-tool part was never implemented — `resources/` was empty) and supersedes `DD-09`/`#52` (the dev-vs-installer split assumed bundling). The wizard's OCR step now shows honest install instructions + a docs link when tools are missing, in all distributions, and never blocks `Next`.
-**Tickets:** `#126`.
+**Installer assistance (`#132`):** "Not bundled" ≠ "no install help." The **NSIS `.exe`** installer (`nsis/hooks.nsh`) detects missing Tesseract/Ghostscript and offers to download + install them (system-wide or portable) from upstream **on the user's machine** — no redistribution, so `DD-10` holds. The **`.msi`** has no such hook (replicating it in MSI is not advisable — needs a WiX Burn bootstrapper Tauri doesn't produce). The `.exe` is the **recommended** installer; the `.msi` targets managed/enterprise deployment.
+**Tickets:** `#126`, `#132` (installer recommendation docs).
 
 ### `DD-04` — Architecture (`2026-04-13`)
 **Decision:** Modular service architecture with `9` modules, LLM provider abstraction, dependency injection, FastAPI backend as Tauri sidecar.
@@ -201,6 +202,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 ---
 
 ## Work Log
+
+### `2026-06-25` — `#132`: Recommend NSIS `.exe` installer; clarify `.msi` (docs)
+**Request:** Post-release Q&A surfaced that the NSIS `.exe` installer already offers to download+install Tesseract/Ghostscript (`nsis/hooks.nsh`), while the `.msi` does not — and the `DD-10` docs read as purely manual. User chose to recommend the `.exe` rather than retrofit the MSI (MSI can't do interactive download/nested installs cleanly; would need a WiX Burn bootstrapper Tauri doesn't generate).
+**Done:** Docs-only. `README.md` install section now recommends the `.exe` (offers OCR-tool install) and frames the `.msi` as a plain managed-deployment installer. `docs/user-guide.md` OCR step notes the `.exe` may have already installed the tools. `docs/architecture.md` + `MEMORY.md` `DD-10` extended with the NSIS install-time download option and the MSI rationale. No code change, no version bump.
+**Result:** Branch `docs/installer-recommendation`.
 
 ### `2026-06-25` — `#129`: Release `v0.7.0` (minor — honest OCR prerequisites + build-script fix)
 **Request:** Finish everything open, then release.
