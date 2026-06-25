@@ -106,6 +106,7 @@ Open `http://localhost:5173` in the browser.
 - The wizard walks through: LLM Provider → Folders → OCR → Summary.
 - After completing the wizard, `config.json` and `.env` are written to the per-user config directory (Windows: `%APPDATA%\zerobox\`, macOS: `~/Library/Application Support/zerobox/`, Linux: `$XDG_CONFIG_HOME/zerobox/` or `~/.config/zerobox/`). Override with `ZEROBOX_CONFIG_DIR`. See `DD-07`.
 - Subsequent launches skip the wizard and show the main app (Review, Rule Profiles, Audit Log, Settings).
+- The wizard's OCR step adapts to the runtime context (`#52`, `DD-09`). `GET /setup/status` reports `run_mode`: `installer` when the backend runs as the bundled PyInstaller build (`sys.frozen`), otherwise `dev`. When OCR dependencies are missing, a `dev` build shows install instructions and lets you continue; an `installer` build shows a "Damaged installation" / repair error and blocks `Next`. Force a mode while developing with `ZEROBOX_RUN_MODE=installer` (or `dev`) on the backend process.
 
 ## Full desktop mode (Tauri shell)
 

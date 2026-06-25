@@ -156,6 +156,11 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architec
 **When to revisit:** When we add bulk import / backup-restore, when client-side offline mode (`IDEA-01` / `IDEA-04`) actually lands, or when we externalise the API beyond the in-app frontend. Tracked in `IDEA-14`.
 **Tickets:** `#86` (the original 422 fix that produced this state), `IDEA-14` (proposal to revisit).
 
+### `DD-09` — Dev vs Installer Runtime Context (`2026-06-25`)
+**Decision:** `GET /setup/status` returns `run_mode: "dev" | "installer"`, derived by `setup.py:_run_mode()`: `ZEROBOX_RUN_MODE` env override first, otherwise `sys.frozen` (`installer` when frozen by PyInstaller, else `dev`). The First-Run-Wizard's OCR step branches on it — `installer` + missing OCR deps → red "Damaged installation" / repair-installer error with `Next` blocked; `dev` + missing → amber install instructions with `Next` allowed (continue, verify later).
+**Rationale:** Resolves the open question from `#52`. Chose Option `1` (backend signal) over the Tauri compile-time flag (only works inside the shell, conflates debug-build with dev-mode) and the bundled-binary heuristic (fragile). Sourcing from `sys.frozen` rather than a launcher-set env var avoids coupling the backend to the Tauri launcher and reuses the same signal `_resources_dir()` already trusts. Aligns the wizard with `DD-06` (installer bundles Tesseract + Ghostscript, so a miss on an installed build is a damaged install, not a user task).
+**Tickets:** `#52`.
+
 ### `DD-04` — Architecture (`2026-04-13`)
 **Decision:** Modular service architecture with `9` modules, LLM provider abstraction, dependency injection, FastAPI backend as Tauri sidecar.
 **Rationale:** See `docs/architecture.md` for the full living document.
@@ -189,6 +194,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 ---
 
 ## Work Log
+
+### `2026-06-25` — `#52`: Distinguish dev vs installer context in wizard dependency checks
+**Request:** Rollout-readiness review → implement `#52` (and publish the dangling `v0.5.1` release) in parallel.
+**Done:** Resolved `#52` per `DD-09`. Backend: `setup.py:_run_mode()` returns `"dev"`/`"installer"` (env override `ZEROBOX_RUN_MODE`, else `sys.frozen`); added `run_mode` to the `SetupStatus` model + `/setup/status` response. Frontend (`SetupWizard.svelte`): OCR step now branches — `installer` + missing deps shows a red "Damaged installation" / repair-installer error with `Next` blocked; `dev` + missing shows amber install instructions with `Next` allowed (continue, verify later). `api.ts` type extended. Docs: `architecture.md` "Open Architecture Questions" → "Resolved Architecture Decisions"; `DD-09` added to `MEMORY.md`; `dev-testing.md` documents `run_mode` + the `ZEROBOX_RUN_MODE` override. Tests: `6` new backend tests (`TestRunMode`), full suite `247` green; frontend `svelte-check` clean. No Postman/Gherkin change (no `/setup/status` example in the collection).
+**Result:** Branch `feature/52-dev-installer-wizard-context`. Feeds into the `v0.6.0` release.
 
 ### `2026-04-19` — `#116`: Document `chore/` branch prefix in `CLAUDE.md`
 **Request:** The repo has been using `chore/` for infra / tooling / lockfile branches (`chore/100-…`, `chore/114-…`), but `CLAUDE.md`'s **Tickets** section only lists `feature/bugfix/hotfix/release`. Legitimise `chore/` and explain the semantics.

@@ -360,16 +360,23 @@ Tauri launches the Python backend as a **sidecar process**. All communication go
 
 ---
 
-## Open Architecture Questions
+## Resolved Architecture Decisions
 
-### Dev vs installer runtime context (`#52`)
+### Dev vs installer runtime context (`#52`, `DD-09`)
 
-The First-Run-Wizard's OCR-dependency step currently treats dev-mode (user runs from source) and installer-mode (bundled app) identically, which contradicts `DD-06` — the installer bundles Tesseract and Ghostscript, so they should never be missing on an installed build. To differentiate the two contexts, three options are under consideration:
+The First-Run-Wizard's OCR-dependency step formerly treated dev-mode (user runs from source) and installer-mode (bundled app) identically, which contradicts `DD-06` — the installer bundles Tesseract and Ghostscript, so they should never be missing on an installed build.
 
-| Option | Mechanism | Pros | Cons |
-|---|---|---|---|
-| `1` Backend signal | `/setup/status` returns `run_mode: "dev" \| "installer"`, derived from an env var set by the Tauri launcher | Runtime-accurate; no frontend coupling to Tauri internals; single source of truth | Backend + frontend change; launcher must set the env var |
-| `2` Tauri compile-time flag | Expose `debug_assertions` (or a custom Cargo feature) via `@tauri-apps/api` | Frontend-only, no backend change | Only works inside the Tauri shell; conflates "debug build" with "dev mode" |
-| `3` Bundled-binary heuristic | Check for a bundled tool path under the Tauri resources directory | No extra plumbing | Fragile; couples detection to bundling layout |
+**Decision:** Option `1` (backend signal), implemented with a launcher-independent source. `GET /setup/status` now returns `run_mode: "dev" | "installer"`, derived by `setup.py:_run_mode()` in this order:
 
-**Current leaning:** Option `1`. Final decision tracked in issue `#52`; revisit after user-testing feedback on the short-term wording fix (`#51`).
+1. `ZEROBOX_RUN_MODE` env override (`"dev"` | `"installer"`) — for tests and unusual deployments.
+2. `sys.frozen` — set by PyInstaller in the bundled installer build (`DD-06`); absent under `python -m zerobox`.
+
+Using `sys.frozen` instead of a launcher-set env var avoids coupling the backend to the Tauri launcher while keeping a single backend-owned source of truth — the same signal `_resources_dir()` already relies on. Option `2` (Tauri compile-time flag) was rejected because it only works inside the Tauri shell and conflates "debug build" with "dev mode"; Option `3` (bundled-binary heuristic) was rejected as fragile.
+
+**Frontend behaviour** (`SetupWizard.svelte`, OCR step):
+
+| `run_mode` | OCR deps missing | Behaviour |
+|---|---|---|
+| `installer` | yes | Red "Damaged installation" error, repair/re-run-installer CTA; `Next` stays blocked. |
+| `dev` | yes | Amber instructions (install yourself, see `README.md` Prerequisites); `Next` is **allowed** (continue, verify later). |
+| either | no | `Next` enabled normally. |
