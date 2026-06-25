@@ -202,6 +202,16 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-06-25` — `#129`: Release `v0.7.0` (minor — honest OCR prerequisites + build-script fix)
+**Request:** Finish everything open, then release.
+**Done:** Bumped all manifests + lockfiles to `0.7.0` via `release/0.7.0` → merged (PR `#130`). Annotated tag `v0.7.0`. Built MSI + NSIS using the **fixed** `scripts/build-installer.ps1` (end-to-end success under PS 5.1 — verifies `#120`). Published GitHub Release `v0.7.0` (bundles `#126`/`DD-10` + `#120`) with both installers + tag-pinned doc links. Smoke test: backend `/setup/status` honestly reports tool availability and no longer returns `run_mode`; both OCR tools detected via well-known paths; `/health` ok; `241` tests green.
+**Result:** `#129` closed. https://github.com/automatix/zerobox/releases/tag/v0.7.0. **All issues closed; no open tickets.**
+
+### `2026-06-25` — `#120`: Make `build-installer.ps1` robust under PowerShell 5.1
+**Request:** Finish all open work.
+**Done:** Replaced `$ErrorActionPreference="Stop"` (which under PS 5.1 turned harmless native-tool stderr into terminating errors and aborted the build) with `Continue` + explicit `$LASTEXITCODE` checks (`Invoke-Native`); silenced the pip version notice; made the script prefer `backend/.venv` for PyInstaller. Documented the build in `docs/dev-testing.md`. Verified by building `v0.7.0` end-to-end with the script.
+**Result:** `#120` closed via PR `#128`.
+
 ### `2026-06-25` — `#126`: Abandon OCR bundling — honest prerequisites + wizard (`DD-10`)
 **Request:** Finish all open work. Decision on the OCR-bundling rollout blocker: **do not bundle** (Ghostscript is AGPL-3.0).
 **Done:** New `DD-10` revises `DD-06` (bundling, never implemented — `resources/` was empty) and supersedes `DD-09`/`#52`: Tesseract + Ghostscript are documented prerequisites. Reverted the `run_mode` mechanism — removed `_run_mode()` + `run_mode` from `SetupStatus`/`/setup/status` (backend), the `TestRunMode` suite, `api.ts`, and the dev/installer branch in `SetupWizard.svelte`. Wizard now shows one honest "OCR tools required (not bundled)" notice with a docs link when tools are missing, and never blocks `Next`. Docs updated: `architecture.md` (`DD-10` section), `README.md` (install + bundling note), `docs/user-guide.md` (OCR step), `docs/dev-testing.md`. Tests green, `svelte-check` clean.
