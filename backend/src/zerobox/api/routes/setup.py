@@ -5,7 +5,6 @@ from __future__ import annotations
 import glob
 import json
 import logging
-import os
 import shutil
 import sys
 from pathlib import Path
@@ -36,7 +35,6 @@ class SetupStatus(BaseModel):
     setup_complete: bool
     has_config: bool
     has_env: bool
-    run_mode: Literal["dev", "installer"]
     tesseract_available: bool
     tesseract_path: str | None
     ghostscript_available: bool
@@ -117,26 +115,6 @@ def _find_executable(
     return None
 
 
-def _run_mode() -> Literal["dev", "installer"]:
-    """Detect whether the backend runs from an installer build or from source.
-
-    Resolution order (see `DD-09` / issue `#52`):
-
-    1. Explicit override via the ``ZEROBOX_RUN_MODE`` environment variable
-       (``"dev"`` or ``"installer"``) — used by tests and unusual deployments.
-    2. :data:`sys.frozen` — set by PyInstaller in the bundled installer build
-       (see ``DD-06``); absent when running ``python -m zerobox`` from source.
-
-    The two contexts have different semantics for missing OCR dependencies: in
-    an installer build the dependencies are bundled, so a miss means a damaged
-    install (repair); in dev the user installs them manually (instructions).
-    """
-    override = os.environ.get("ZEROBOX_RUN_MODE", "").strip().lower()
-    if override in ("dev", "installer"):
-        return override  # type: ignore[return-value]
-    return "installer" if getattr(sys, "frozen", False) else "dev"
-
-
 def _is_setup_complete() -> bool:
     """Check if the setup has been completed previously."""
     config_path = _config_dir() / "config.json"
@@ -174,7 +152,6 @@ async def get_setup_status() -> SetupStatus:
         setup_complete=_is_setup_complete(),
         has_config=(base / "config.json").exists(),
         has_env=(base / ".env").exists(),
-        run_mode=_run_mode(),
         tesseract_available=tesseract is not None,
         tesseract_path=tesseract,
         ghostscript_available=ghostscript is not None,

@@ -39,7 +39,7 @@ Download the latest installer from the [Releases](https://github.com/automatix/z
 - **MSI** — standard Windows Installer package
 - **NSIS** — executable installer
 
-The installer bundles the backend, frontend, and all required dependencies.
+The installer bundles the backend and frontend. The OCR tools **Tesseract** and **Ghostscript** are not bundled (Ghostscript is AGPL-licensed) — install them separately, see [Prerequisites](#prerequisites).
 
 ### Configuration
 

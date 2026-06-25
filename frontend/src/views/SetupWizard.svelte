@@ -29,7 +29,6 @@
 
   // OCR dependency status (fetched on entering the OCR step, refetchable on demand)
   type DepStatus = {
-    run_mode: 'dev' | 'installer';
     tesseract_available: boolean;
     tesseract_path: string | null;
     ghostscript_available: boolean;
@@ -44,20 +43,10 @@
       depStatus.tesseract_available &&
       depStatus.ghostscript_available,
   );
-  // Dev vs installer context (#52): in an installer build the OCR tools are
-  // bundled (DD-06), so a miss means a damaged install that must be repaired —
-  // Next stays blocked. In dev the user installs the tools manually, so they
-  // may continue and verify later.
-  const isInstaller = $derived(depStatus?.run_mode === 'installer');
-  const isDev = $derived(depStatus?.run_mode === 'dev');
-  const nextDisabled = $derived(
-    step === 'ocr' && !ocrRequirementsMet && !isDev,
-  );
-  const nextDisabledReason = $derived(
-    isInstaller
-      ? 'Repair the installation to continue (re-run the installer).'
-      : 'Install the missing OCR dependencies to continue.',
-  );
+  // OCR tools (Tesseract, Ghostscript) are user-installed prerequisites — they
+  // are NOT bundled (DD-10; Ghostscript is AGPL-licensed). When they are
+  // missing we show install instructions and let the user continue and verify
+  // later, so `Next` is never blocked here.
 
   async function checkDependencies() {
     depLoading = true;
@@ -65,7 +54,6 @@
     try {
       const status = await api.getSetupStatus();
       depStatus = {
-        run_mode: status.run_mode,
         tesseract_available: status.tesseract_available,
         tesseract_path: status.tesseract_path,
         ghostscript_available: status.ghostscript_available,
@@ -359,20 +347,14 @@
                   {/if}
                 </div>
                 {#if !ocrRequirementsMet}
-                  {#if isInstaller}
-                    <div class="mt-2 rounded-md bg-red-50 border border-red-200 p-3">
-                      <p class="text-xs text-red-700 font-medium">
-                        Damaged installation
-                      </p>
-                      <p class="text-xs text-red-700 mt-1">
-                        These OCR components ship with the zerobox installer, so they should never be missing on an installed build. This indicates an incomplete or damaged installation. Please repair zerobox by re-running the installer, then click "Check requirements" again.
-                      </p>
-                    </div>
-                  {:else}
-                    <p class="text-xs text-amber-600 mt-2">
-                      OCR is required for zerobox to process scans. As you are running from source, install the missing tools yourself — see the Prerequisites section in README.md — then click "Check requirements" to re-verify. You may continue setup now and verify later.
+                  <div class="mt-2 rounded-md bg-amber-50 border border-amber-200 p-3">
+                    <p class="text-xs text-amber-700 font-medium">
+                      OCR tools required
                     </p>
-                  {/if}
+                    <p class="text-xs text-amber-700 mt-1">
+                      zerobox uses Tesseract OCR and Ghostscript to process scans. These are not bundled with zerobox — please install the missing tool(s), then click "Check requirements" to re-verify. See the Prerequisites section in the README (also under the Help tab). You can continue setup now and install them later.
+                    </p>
+                  </div>
                 {/if}
               </div>
             {/if}
@@ -437,19 +419,12 @@
           {saving ? 'Saving...' : 'Finish Setup'}
         </button>
       {:else}
-        <div class="flex flex-col items-end gap-1">
-          <button
-            onclick={next}
-            disabled={nextDisabled}
-            title={nextDisabled ? nextDisabledReason : ''}
-            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Next
-          </button>
-          {#if nextDisabled}
-            <span class="text-xs text-amber-600">{nextDisabledReason}</span>
-          {/if}
-        </div>
+        <button
+          onclick={next}
+          class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+        >
+          Next
+        </button>
       {/if}
     </div>
   </div>

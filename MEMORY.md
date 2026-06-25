@@ -133,9 +133,10 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architec
 **Decision:** `7`-phase roadmap with `29` tickets (`#1` through `#29`), tracked as GitHub Issues with phase labels.
 **Rationale:** Phases follow the dependency graph (Foundation → Ingestion → Classification → Pipeline → API → Frontend → Packaging). See `docs/roadmap.md`.
 
-### `DD-06` — Installer Bundling Strategy (`2026-04-13`)
+### `DD-06` — Installer Bundling Strategy (`2026-04-13`) — **partially superseded by `DD-10`**
 **Decision:** The Windows installer bundles all runtime dependencies (Python, Tesseract, Ghostscript) so the end user has zero prerequisites to install manually.
 **Rationale:** Minimum effort for the end user. Trade-off: larger installer (~`200`–`300` MB), but zero-setup experience. Python backend will be packaged as standalone executable (via PyInstaller or cx_Freeze). Tesseract and Ghostscript are bundled alongside. Only user-provided requirement: an API key (Claude/OpenAI) unless using a local LLM.
+**Update (`2026-06-25`):** The Tesseract/Ghostscript bundling part was **never implemented** (`resources/` shipped empty) and is now **dropped** — see `DD-10`. The PyInstaller backend + Tauri shell remain bundled; the OCR tools become documented prerequisites.
 
 ### `DD-07` — Config Storage Location (`2026-04-19`)
 **Decision:** Hybrid layout. `config.json` and `.env` live in an OS-conventional per-user config directory: `%APPDATA%\zerobox\` on Windows, `~/Library/Application Support/zerobox/` on macOS, `$XDG_CONFIG_HOME/zerobox/` (fallback `~/.config/zerobox/`) on Linux. The env var `ZEROBOX_CONFIG_DIR` overrides for dev/tests. Final fallback: `~/.zerobox/`. Data folders (inbox, archive/output, profiles, audit DB) remain freely configurable via `config.json` — no change there.
@@ -156,10 +157,16 @@ See section [Tech Stack Proposal](#tech-stack-proposal) below and `docs/architec
 **When to revisit:** When we add bulk import / backup-restore, when client-side offline mode (`IDEA-01` / `IDEA-04`) actually lands, or when we externalise the API beyond the in-app frontend. Tracked in `IDEA-14`.
 **Tickets:** `#86` (the original 422 fix that produced this state), `IDEA-14` (proposal to revisit).
 
-### `DD-09` — Dev vs Installer Runtime Context (`2026-06-25`)
+### `DD-09` — Dev vs Installer Runtime Context (`2026-06-25`) — **SUPERSEDED by `DD-10`**
 **Decision:** `GET /setup/status` returns `run_mode: "dev" | "installer"`, derived by `setup.py:_run_mode()`: `ZEROBOX_RUN_MODE` env override first, otherwise `sys.frozen` (`installer` when frozen by PyInstaller, else `dev`). The First-Run-Wizard's OCR step branches on it — `installer` + missing OCR deps → red "Damaged installation" / repair-installer error with `Next` blocked; `dev` + missing → amber install instructions with `Next` allowed (continue, verify later).
 **Rationale:** Resolves the open question from `#52`. Chose Option `1` (backend signal) over the Tauri compile-time flag (only works inside the shell, conflates debug-build with dev-mode) and the bundled-binary heuristic (fragile). Sourcing from `sys.frozen` rather than a launcher-set env var avoids coupling the backend to the Tauri launcher and reuses the same signal `_resources_dir()` already trusts. Aligns the wizard with `DD-06` (installer bundles Tesseract + Ghostscript, so a miss on an installed build is a damaged install, not a user task).
-**Tickets:** `#52`.
+**Superseded (`2026-06-25`, `#126`):** Its premise (bundling, per `DD-06`) was dropped by `DD-10`. With nothing bundled the dev/installer distinction is meaningless; `run_mode`/`_run_mode()` were removed and the wizard now behaves uniformly. Shipped only in `v0.6.0`.
+**Tickets:** `#52`, superseded by `#126`.
+
+### `DD-10` — OCR Tools Are Prerequisites, Not Bundled (`2026-06-25`)
+**Decision:** zerobox does **not** bundle Tesseract or Ghostscript. They are documented user-installed prerequisites (checked by the wizard via `/setup/status`). The PyInstaller backend + Tauri shell remain bundled.
+**Rationale:** **Ghostscript is AGPL-3.0** — redistributing it in the installer would impose AGPL obligations on the distributed product (project owner's decision to avoid). Tesseract (Apache-2.0) is left as a prerequisite too for a consistent, honest story. Revises `DD-06` (bundling, whose OCR-tool part was never implemented — `resources/` was empty) and supersedes `DD-09`/`#52` (the dev-vs-installer split assumed bundling). The wizard's OCR step now shows honest install instructions + a docs link when tools are missing, in all distributions, and never blocks `Next`.
+**Tickets:** `#126`.
 
 ### `DD-04` — Architecture (`2026-04-13`)
 **Decision:** Modular service architecture with `9` modules, LLM provider abstraction, dependency injection, FastAPI backend as Tauri sidecar.
@@ -194,6 +201,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 ---
 
 ## Work Log
+
+### `2026-06-25` — `#126`: Abandon OCR bundling — honest prerequisites + wizard (`DD-10`)
+**Request:** Finish all open work. Decision on the OCR-bundling rollout blocker: **do not bundle** (Ghostscript is AGPL-3.0).
+**Done:** New `DD-10` revises `DD-06` (bundling, never implemented — `resources/` was empty) and supersedes `DD-09`/`#52`: Tesseract + Ghostscript are documented prerequisites. Reverted the `run_mode` mechanism — removed `_run_mode()` + `run_mode` from `SetupStatus`/`/setup/status` (backend), the `TestRunMode` suite, `api.ts`, and the dev/installer branch in `SetupWizard.svelte`. Wizard now shows one honest "OCR tools required (not bundled)" notice with a docs link when tools are missing, and never blocks `Next`. Docs updated: `architecture.md` (`DD-10` section), `README.md` (install + bundling note), `docs/user-guide.md` (OCR step), `docs/dev-testing.md`. Tests green, `svelte-check` clean.
+**Result:** Branch `feature/126-honest-ocr-prerequisites`. Net effect of `#52` + `#126`: OCR tools are explicit prerequisites with an honest wizard.
 
 ### `2026-06-25` — `#121`: Release `v0.6.0` (minor — dev-vs-installer wizard context)
 **Request:** Cut `v0.6.0` bundling `#52` (second of the two agreed releases).

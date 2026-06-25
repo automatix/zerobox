@@ -50,7 +50,7 @@ Three paths. `~` expands to your home directory automatically.
 ### Step `3` — OCR
 
 - **OCR Language(s)** — Tesseract language codes joined by `+`. Examples: `deu+eng` (German + English), `deu+eng+rus` (also Russian). The languages must be installed in Tesseract.
-- **OCR Requirements** — Tesseract and Ghostscript must be installed on your system. The wizard checks both and shows a coloured dot per dependency. If a dot is red, install the missing tool and click **Check requirements** to re-verify. **Next** stays disabled until both are green.
+- **OCR Requirements** — Tesseract and Ghostscript must be installed on your system. They are **not bundled** with zerobox (Ghostscript is AGPL-licensed), so you install them yourself. The wizard checks both and shows a coloured dot per dependency. If a dot is red, install the missing tool and click **Check requirements** to re-verify. You can continue the wizard and install them later — but OCR will not work until both are green.
 
 ### Step `4` — Summary
 

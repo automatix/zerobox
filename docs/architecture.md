@@ -362,21 +362,13 @@ Tauri launches the Python backend as a **sidecar process**. All communication go
 
 ## Resolved Architecture Decisions
 
-### Dev vs installer runtime context (`#52`, `DD-09`)
+### OCR tools are user prerequisites, not bundled (`#126`, `DD-10`)
 
-The First-Run-Wizard's OCR-dependency step formerly treated dev-mode (user runs from source) and installer-mode (bundled app) identically, which contradicts `DD-06` — the installer bundles Tesseract and Ghostscript, so they should never be missing on an installed build.
+`DD-06` originally called for the installer to bundle all runtime dependencies (Python, Tesseract, Ghostscript) for a zero-setup experience. **`DD-10` revises this:** Tesseract and Ghostscript are **not** bundled — they are documented user-installed prerequisites. The decisive reason is licensing: **Ghostscript is AGPL-3.0**, and redistributing it inside the installer would impose AGPL obligations on the distributed product. (Tesseract is Apache-2.0 and would be safe, but is left as a prerequisite too for a consistent, honest story.) The PyInstaller-packaged backend and the Tauri shell are still bundled.
 
-**Decision:** Option `1` (backend signal), implemented with a launcher-independent source. `GET /setup/status` now returns `run_mode: "dev" | "installer"`, derived by `setup.py:_run_mode()` in this order:
+**Consequence — supersedes `DD-09` / `#52`.** The dev-vs-installer `run_mode` distinction introduced by `#52` assumed bundling (installer → tools always present → a miss means a damaged install). With nothing bundled, the OCR tools can be missing in *any* distribution, so that distinction is meaningless. The `run_mode` field and `_run_mode()` were removed from `/setup/status`. The First-Run-Wizard's OCR step now behaves uniformly:
 
-1. `ZEROBOX_RUN_MODE` env override (`"dev"` | `"installer"`) — for tests and unusual deployments.
-2. `sys.frozen` — set by PyInstaller in the bundled installer build (`DD-06`); absent under `python -m zerobox`.
+- **OCR deps missing** → amber "OCR tools required" notice explaining the tools are not bundled, with a link to the Prerequisites docs (README / in-app Help). `Next` is **allowed** — the user may continue and install them later.
+- **OCR deps present** → green dots, `Next` enabled.
 
-Using `sys.frozen` instead of a launcher-set env var avoids coupling the backend to the Tauri launcher while keeping a single backend-owned source of truth — the same signal `_resources_dir()` already relies on. Option `2` (Tauri compile-time flag) was rejected because it only works inside the Tauri shell and conflates "debug build" with "dev mode"; Option `3` (bundled-binary heuristic) was rejected as fragile.
-
-**Frontend behaviour** (`SetupWizard.svelte`, OCR step):
-
-| `run_mode` | OCR deps missing | Behaviour |
-|---|---|---|
-| `installer` | yes | Red "Damaged installation" error, repair/re-run-installer CTA; `Next` stays blocked. |
-| `dev` | yes | Amber instructions (install yourself, see `README.md` Prerequisites); `Next` is **allowed** (continue, verify later). |
-| either | no | `Next` enabled normally. |
+The backend still locates the tools via `setup.py:_find_executable` (`PATH` → well-known install globs; a portable `resources/` path is still checked first, harmlessly, should anyone choose to drop binaries there).
