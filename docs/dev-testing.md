@@ -119,6 +119,19 @@ This uses the `@tauri-apps/cli` devDependency already installed by `npm install`
 
 Either command starts both the backend sidecar and the Tauri WebView window. In dev mode (`debug_assertions`), the backend is **not** auto-started by Tauri — you must run it manually in Terminal 1.
 
+## Building the installer (MSI + NSIS)
+
+```powershell
+scripts/build-installer.ps1
+```
+
+The script packages the backend with PyInstaller, copies it into the Tauri sidecar `binaries/` directory, and runs `npm run tauri build`. Output lands under `frontend/src-tauri/target/release/bundle/` (`msi/` and `nsis/`).
+
+Notes:
+- Runs under both **Windows PowerShell 5.1** and **PowerShell 7+**. It checks each native tool's exit code explicitly rather than relying on `$ErrorActionPreference = "Stop"`, which under PS 5.1 would abort on harmless stderr output from `pip` / `pyinstaller` / `npm` / `cargo` (`#120`).
+- It prefers `backend/.venv` (so PyInstaller can trace the backend's dependencies). Create it first via the Prerequisites steps; otherwise the script falls back to the `python` on `PATH` and warns.
+- The OCR tools (Tesseract, Ghostscript) are **not** bundled — they are user prerequisites (`DD-10`).
+
 ## Testing the setup endpoints directly
 
 ```bash
