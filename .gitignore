@@ -29,9 +29,10 @@ frontend/src-tauri/gen/
 # Synced docs (regenerated from /docs and /README.md by frontend/scripts/sync-docs.mjs)
 frontend/public/docs/
 
-# Local dev files (directory tracked, contents ignored)
+# Local dev / scratch files (never committed)
 .local/*
 !.local/.gitkeep
+local/
 
 # Secrets drop (never commit)
 docs/keys.md
