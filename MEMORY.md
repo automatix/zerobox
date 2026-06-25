@@ -195,6 +195,16 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-06-25` — `#121`: Release `v0.6.0` (minor — dev-vs-installer wizard context)
+**Request:** Cut `v0.6.0` bundling `#52` (second of the two agreed releases).
+**Done:** Bumped all manifests + lockfiles (`pyproject.toml`, `package.json`, `package-lock.json`, `Cargo.toml`, `Cargo.lock`, `tauri.conf.json`) to `0.6.0` via `release/0.6.0` → merged to `master` (PR `#122`). Annotated tag `v0.6.0`. Built MSI + NSIS (manual build sequence — see `#120`), published GitHub Release `v0.6.0` with both installers + tag-pinned doc links.
+**Result:** `#121` closed. https://github.com/automatix/zerobox/releases/tag/v0.6.0
+
+### `2026-06-25` — `#118`: Publish the dangling `v0.5.1` GitHub release
+**Request:** The `v0.5.1` tag existed but had no GitHub release / installers (incomplete per the release procedure). Publish it.
+**Done:** Built MSI + NSIS from `master` (provenance noted: chore/docs commits ahead of the tag; Node `25`/npm `11`, no `npm install` so lockfile untouched). Created GitHub Release `v0.5.1` (ref = existing tag) with both installers + tag-pinned doc links.
+**Result:** `#118` closed. https://github.com/automatix/zerobox/releases/tag/v0.5.1. Discovered the build script breaks under PowerShell 5.1 on native-tool stderr → filed `#120` (bugfix, not yet implemented).
+
 ### `2026-06-25` — `#52`: Distinguish dev vs installer context in wizard dependency checks
 **Request:** Rollout-readiness review → implement `#52` (and publish the dangling `v0.5.1` release) in parallel.
 **Done:** Resolved `#52` per `DD-09`. Backend: `setup.py:_run_mode()` returns `"dev"`/`"installer"` (env override `ZEROBOX_RUN_MODE`, else `sys.frozen`); added `run_mode` to the `SetupStatus` model + `/setup/status` response. Frontend (`SetupWizard.svelte`): OCR step now branches — `installer` + missing deps shows a red "Damaged installation" / repair-installer error with `Next` blocked; `dev` + missing shows amber install instructions with `Next` allowed (continue, verify later). `api.ts` type extended. Docs: `architecture.md` "Open Architecture Questions" → "Resolved Architecture Decisions"; `DD-09` added to `MEMORY.md`; `dev-testing.md` documents `run_mode` + the `ZEROBOX_RUN_MODE` override. Tests: `6` new backend tests (`TestRunMode`), full suite `247` green; frontend `svelte-check` clean. No Postman/Gherkin change (no `/setup/status` example in the collection).
