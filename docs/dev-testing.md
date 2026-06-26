@@ -132,6 +132,8 @@ Notes:
 - It prefers `backend/.venv` (so PyInstaller can trace the backend's dependencies). Create it first via the Prerequisites steps; otherwise the script falls back to the `python` on `PATH` and warns.
 - The OCR tools (Tesseract, Ghostscript) are **not** bundled — they are user prerequisites (`DD-10`).
 
+For the full picture — how the installer/uninstaller work end to end, the user-facing flow, the decisions and problems behind them, and what is general vs Python- vs zerobox-specific — see [`windows-installer.md`](./windows-installer.md).
+
 ## Testing the setup endpoints directly
 
 ```bash
