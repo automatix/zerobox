@@ -42,3 +42,10 @@ def create_provider(config: LLMConfig) -> LLMProvider:
             f"Available: {available}"
         )
     return _PROVIDERS[config.provider](config)
+
+
+# Import the built-in provider modules so their @register decorators run on package
+# import — without this the registry is empty at runtime and create_provider fails
+# with "Unknown LLM provider" (#147). Must stay at the bottom: the modules import
+# `register` from this package.
+from zerobox.classifier.providers import anthropic as _anthropic  # noqa: E402, F401
