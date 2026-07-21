@@ -58,13 +58,17 @@ try {
     # Install PyInstaller into the chosen interpreter if needed.
     Invoke-Native { & $python -m pip install pyinstaller --quiet } "pip install pyinstaller"
 
-    # Build the backend as a single executable.
+    # Build the backend as a single executable. The zerobox package and its full
+    # dependency tree are traced statically from __main__.py's `from zerobox.app
+    # import create_app` (#146) — do NOT reintroduce the old
+    # `--add-data "src/zerobox;zerobox"` + factory-string approach: it shipped the
+    # backend without fastapi & friends. The uvicorn hidden imports stay because
+    # uvicorn resolves its loops/protocols implementations dynamically.
     Invoke-Native {
         & $python -m PyInstaller `
             --name "zerobox-backend-x86_64-pc-windows-msvc" `
             --onefile `
             --noconsole `
-            --add-data "src/zerobox;zerobox" `
             --hidden-import "uvicorn.logging" `
             --hidden-import "uvicorn.loops" `
             --hidden-import "uvicorn.loops.auto" `
@@ -77,6 +81,40 @@ try {
             --hidden-import "uvicorn.lifespan.on" `
             src/zerobox/__main__.py
     } "PyInstaller"
+
+    # Smoke test: the frozen sidecar must actually boot and serve /health (#146).
+    # A missing bundled dependency crashes the exe on launch — catch that here
+    # instead of after shipping an installer.
+    Write-Host "=== Step 1.5: Smoke-test the sidecar exe ===" -ForegroundColor Cyan
+    $healthUrl = "http://127.0.0.1:8000/health"
+    $portBusy = $false
+    try {
+        Invoke-WebRequest -Uri $healthUrl -UseBasicParsing -TimeoutSec 2 | Out-Null
+        $portBusy = $true
+    } catch {}
+    if ($portBusy) {
+        Write-Host "Port 8000 is already serving /health (dev backend running?) - skipping the smoke test. Stop the dev backend for a fully verified build." -ForegroundColor Yellow
+    } else {
+        $sidecar = Start-Process -FilePath (Resolve-Path "dist\zerobox-backend-x86_64-pc-windows-msvc.exe") -PassThru
+        try {
+            $healthy = $false
+            foreach ($attempt in 1..30) {
+                if ($sidecar.HasExited) { break }
+                Start-Sleep -Milliseconds 500
+                try {
+                    $resp = Invoke-WebRequest -Uri $healthUrl -UseBasicParsing -TimeoutSec 2
+                    if ($resp.StatusCode -eq 200) { $healthy = $true; break }
+                } catch {}
+            }
+            if (-not $healthy) {
+                throw "Sidecar smoke test failed: the frozen backend did not serve $healthUrl (exited: $($sidecar.HasExited))."
+            }
+            Write-Host "Sidecar smoke test passed: /health is up." -ForegroundColor Green
+        }
+        finally {
+            if (-not $sidecar.HasExited) { Stop-Process -Id $sidecar.Id -Force }
+        }
+    }
 
     # Copy to Tauri binaries.
     if (!(Test-Path $binDir)) { New-Item -ItemType Directory -Path $binDir | Out-Null }
