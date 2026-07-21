@@ -346,6 +346,18 @@ Tauri launches the Python backend as a **sidecar process**. All communication go
 | `GET` | `/update/check` | Compare running version against the latest GitHub Release |
 | `POST` | `/update/install` | Download the latest installer, launch it, exit the backend |
 
+### In-App Updater Flow
+
+Ported from the Receipt Board updater (receipt-board#81–#83, #191); the generic component
+breakdown lives in `docs/in-app-updater.md`.
+
+`1.` The GUI checks `GET /update/check` silently on startup and on demand via the **Updates** header button (a manual re-check dismisses a visible banner first, so the re-check is observable).
+`2.` A newer release shows a non-blocking banner (release-notes link, **Install now** / **Later**). Installing is never automatic.
+`3.` On confirm, `POST /update/install` re-resolves the release server-side, validates the asset host (GitHub only), downloads the NSIS installer to `%APPDATA%/zerobox/updates/`, launches it detached, and schedules the backend's own exit.
+`4.` The frontend then closes the Tauri window (`core:window:allow-close`). With both processes gone, the interactive UAC-gated installer replaces the installation.
+
+Version sources: backend `zerobox.__version__`, frontend Tauri `getVersion()` (from `tauri.conf.json`) — both bumped by the release procedure.
+
 ---
 
 ## Tech Stack Summary

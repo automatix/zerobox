@@ -203,6 +203,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-07-22` — `#138`: Updater GUI — Updates button + startup banner + confirm flow
+**Request:** Third updater slice (analog to receipt-board#83 incl. the receipt-board#191 UX fix): the GUI.
+**Done:** New `frontend/src/lib/updates.svelte.ts` (runes store: manual check with dismiss-first re-check, silent startup check, explicit install) + `views/UpdateBanner.svelte` (non-blocking banner: version line, What's-new link, Install now / Later). `App.svelte`: **Updates** header button, real app version via Tauri `getVersion()` (replaces stale hardcoded `v0.5.1`), silent check once the main view is up (not during the wizard). After install the frontend closes the Tauri window (`core:window:allow-close` capability added); the backend sidecar exits itself (`#137`). `api.ts`: `checkUpdate`/`installUpdate`; `fetchJson` gained a `notifyError` flag and now surfaces FastAPI `detail` messages. Gherkin catch-up: `updates.feature` + steps (newer / current / unreachable). `docs/user-guide.md` Updates section; `docs/architecture.md` updater-flow section.
+**Result:** Branch `feature/updater-gui`. Backend `282` tests green; `svelte-check` `0` errors; vite build OK.
+
 ### `2026-07-22` — `#137`: Updater download + launch installer, then quit the app
 **Request:** Second updater slice (analog to receipt-board#82): `POST /update/install`.
 **Done:** `updates.py` gained `is_trusted_asset_url` (GitHub hosts only), `download_installer` (streams to `%APPDATA%/zerobox/updates`), `launch_installer` (detached subprocess). `POST /update/install` re-resolves the release server-side (client URL never trusted), validates the asset host, downloads, launches, then exits the backend via a delayed `schedule_shutdown` (Tauri adaptation of Receipt Board's pywebview shutdown hook — the sidecar exits itself; the frontend closes the window in `#138`). Error paths: `409` no update, `400` untrusted host, `502` download failure. `12` new tests (mock transport, monkeypatched launcher/shutdown); Postman `Install Update` request; `docs/architecture.md` updated.
