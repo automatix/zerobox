@@ -158,7 +158,6 @@ python -m PyInstaller `
     --name "zerobox-backend-x86_64-pc-windows-msvc" `
     --onefile `
     --noconsole `
-    --add-data "src/zerobox;zerobox" `
     --hidden-import "uvicorn.logging" `
     --hidden-import "uvicorn.loops" `
     --hidden-import "uvicorn.loops.auto" `
@@ -175,14 +174,40 @@ Decisions baked in here, and why:
   model. **Receipt Board already uses `--onedir`** — a valid, different choice.
 - 🟨 **`--noconsole`** (a.k.a. windowed) → no stray console window pops up
   behind the GUI. Required for a polished desktop app.
+- 🟨 **Windowed builds have `sys.stdout`/`sys.stderr` = `None`.** Anything that
+  writes to them crashes — uvicorn's default log formatters call
+  `sys.stdout.isatty()` at logging init, killing the server before it binds a
+  port (Receipt Board hit this as receipt-board#37, zerobox as `#146`). Fix in
+  the entry point, before `uvicorn.run`: when the streams are `None`, point
+  them at a log file in the per-user app dir (fallback: `os.devnull`). A
+  console (non-windowed) build of the same code works fine, which makes this
+  bug easy to miss in terminal-based testing.
 - 🟨 **`--hidden-import uvicorn.*`** → **the single most common PyInstaller
   gotcha for FastAPI / uvicorn apps.** uvicorn loads its protocol / loop /
   lifespan implementations by **dynamic string import**, which PyInstaller's
   static analysis cannot see, so they are missing at runtime unless declared.
   Any ASGI app frozen with PyInstaller hits this. (See the full list in the
   build script.)
-- 🟨 **`--add-data "src/zerobox;zerobox"`** → bundles non-code package data.
-  Note the Windows path separator is **`;`** (it is `:` on POSIX).
+- 🟨 **The entry point must import the app statically.** The same dynamic-import
+  gotcha applies to your *own* app: `uvicorn.run("pkg.app:create_app",
+  factory=True)` hides the entire application — and its whole third-party
+  dependency tree (fastapi, pydantic, …) — from PyInstaller's analysis. zerobox
+  `v0.8.0` shipped exactly this bug (`#146`): the frozen sidecar contained
+  uvicorn but **no fastapi**, and died on launch with `ModuleNotFoundError`.
+  Fix: `from pkg.app import create_app; uvicorn.run(create_app(), ...)` in the
+  entry script, so analysis walks the real import graph. (Shipping the package
+  as `--add-data` source instead does **not** help — data files are not
+  analyzed, so their imports stay unbundled.)
+- 🟨 **Smoke-test the frozen exe in the build script** — boot it, poll
+  `GET /health`, kill it, and fail the build if it never comes up. A missing
+  bundled module only ever manifests **at runtime of the frozen binary**; no
+  amount of green unit tests (which run in the venv) catches it. This check is
+  what turns the gotcha above from a shipped-installer incident into a failed
+  build.
+- 🟨 **`--add-data "<src>;<dest>"`** → bundles non-code package data (config
+  templates, JSON schemas, …) *if your app reads such files at runtime*. Note
+  the Windows path separator is **`;`** (it is `:` on POSIX). zerobox needs
+  none since `#146` dropped the source-as-data workaround.
 - 🟥 **`--name …-x86_64-pc-windows-msvc`** → the **target-triple suffix is not
   cosmetic**. Tauri's sidecar mechanism requires the external binary to be named
   `<base>-<target-triple>.exe`; at build time Tauri strips the triple and
