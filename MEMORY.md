@@ -203,6 +203,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-07-22` — `#146`: Packaged sidecar crashes on launch — bundle missed all backend deps
+**Request:** Installed `v0.8.0` does not start: sidecar dies with `ModuleNotFoundError: No module named 'fastapi'` (autonomous `/goal`).
+**Done:** Two-layer fix. (`1`) Root cause: `__main__.py` loaded the app via factory string (`uvicorn.run("zerobox.app:create_app")`) and the build shipped `zerobox` only as `--add-data` source — PyInstaller never traced fastapi/pydantic/ocrmypdf/anthropic/httpx (`fastapi` `0`× in `Analysis-00.toc`, exe `11.5 MB`). Fixed by importing `create_app` statically; dropped the redundant `--add-data` (no code reads package data). Exe now `59.5 MB`, `fastapi` `78`×. (`2`) Uncovered next layer: `--noconsole` builds have `sys.stdout`/`sys.stderr` = `None`; uvicorn's log formatter calls `isatty()` → silent crash (console build worked fine — Receipt Board's receipt-board#37). Ported `ensure_writable_streams()` (redirect to `%APPDATA%/zerobox/zerobox-backend.log`, fallback devnull). Build script gained a **smoke test** (boot exe, poll `/health`, fail build otherwise; skipped with warning if port `8000` busy). Verified: frozen exe serves `/health` + `/setup/status`. `3` new unit tests (incl. regression: `uvicorn.run` gets an app object, not a string). Docs: `windows-installer.md` (both gotchas + smoke test as foundation guidance), `dev-testing.md`.
+**Result:** Branch `hotfix/sidecar-missing-deps`. Also confirmed: earlier installers had the same latent bug. Follow-ups: `#147` (provider registry), private-repo updater gap (needs user decision).
+
 ### `2026-07-22` — `#144`: Release `v0.8.0` (minor — in-app updater)
 **Request:** Release the in-app updater (`/goal` finale).
 **Done:** Bumped `0.7.0` → `0.8.0` in all `5` manifests (now including `backend/src/zerobox/__init__.py`, added to the procedure in `#136`) plus `package-lock.json` / `Cargo.lock`. Minor: new backward-compatible user-facing feature (updater `#136`–`#138`; `#139` docs). Tagged `v0.8.0`, built MSI + NSIS via `scripts/build-installer.ps1`, published the GitHub Release with both installers and tag-pinned doc links.
