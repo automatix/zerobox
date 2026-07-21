@@ -203,6 +203,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-07-22` — `#139`: Generic in-app updater description as reusable foundation (docs)
+**Request:** Meta ticket (by-product of the updater port): capture the update system's sub-functionalities as a short generic description for future projects, analogous to `docs/windows-installer.md` (`#134`).
+**Done:** New `docs/in-app-updater.md`: flow overview, `11` components (version source, release feed, semver compare, asset selection, check endpoint, trusted download, detached launch, app self-termination, GUI: silent startup check / manual dismiss-first check / banner confirm flow), security invariants, Receipt Board vs. zerobox reference table, adaptation checklist. Linked from `README.md` (docs tree) and `docs/architecture.md` (updater-flow section). Not added to the in-app Help tab — consistent with `windows-installer.md` (dev-facing docs stay out of the fixed `sync-docs.mjs` list).
+**Result:** Branch `chore/139-in-app-updater-doc`. Docs-only, no version bump on its own.
+
 ### `2026-07-22` — `#138`: Updater GUI — Updates button + startup banner + confirm flow
 **Request:** Third updater slice (analog to receipt-board#83 incl. the receipt-board#191 UX fix): the GUI.
 **Done:** New `frontend/src/lib/updates.svelte.ts` (runes store: manual check with dismiss-first re-check, silent startup check, explicit install) + `views/UpdateBanner.svelte` (non-blocking banner: version line, What's-new link, Install now / Later). `App.svelte`: **Updates** header button, real app version via Tauri `getVersion()` (replaces stale hardcoded `v0.5.1`), silent check once the main view is up (not during the wizard). After install the frontend closes the Tauri window (`core:window:allow-close` capability added); the backend sidecar exits itself (`#137`). `api.ts`: `checkUpdate`/`installUpdate`; `fetchJson` gained a `notifyError` flag and now surfaces FastAPI `detail` messages. Gherkin catch-up: `updates.feature` + steps (newer / current / unreachable). `docs/user-guide.md` Updates section; `docs/architecture.md` updater-flow section.

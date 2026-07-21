@@ -202,6 +202,7 @@ zerobox/
 ├── scripts/                  # Build and installer scripts
 ├── docs/
 │   ├── architecture.md       # Living architecture document
+│   ├── in-app-updater.md     # Generic in-app updater foundation (reusable)
 │   └── postman/              # Postman collection
 ├── CLAUDE.md
 └── README.md
