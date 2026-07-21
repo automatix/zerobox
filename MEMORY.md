@@ -203,6 +203,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-07-22` — `#150`: Updater feed strategy resolved — repo made public
+**Request:** User decision on `#150`: the repo `automatix/zerobox` is now **public** (option `1`, matching the Receipt Board model).
+**Done:** No code change (`DEFAULT_REPO` already `automatix/zerobox`). Verified end-to-end against the live unauthenticated GitHub API: simulated `0.8.0` install → `update_available: true` with correct notes URL + trusted NSIS asset URL; current `0.8.1` → up to date. The in-app **Updates** button and silent startup check are functional in installed `v0.8.1` apps.
+**Result:** `#150` closed as done.
+
 ### `2026-07-22` — `#151`: Release `v0.8.1` (patch — startup hotfix for the packaged app)
 **Request:** Ship the fixed installer (`/goal` finale of the `v0.8.0`-broken incident).
 **Done:** Bumped `0.8.0` → `0.8.1` (all `5` manifests + locks). Patch: pure bugfixes — `#146` (frozen sidecar: static app import, writable streams, build smoke test) and `#147` (provider registration). Built installers via `scripts/build-installer.ps1` (smoke test green), published the GitHub Release; `v0.8.0` release notes got a prominent broken-release warning pointing to `v0.8.1`. Also filed `#150`: the updater cannot work while the repo is private (unauthenticated GitHub API → `404`) — feed-strategy decision left to the user.
