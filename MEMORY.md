@@ -203,6 +203,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-07-22` — `#144`: Release `v0.8.0` (minor — in-app updater)
+**Request:** Release the in-app updater (`/goal` finale).
+**Done:** Bumped `0.7.0` → `0.8.0` in all `5` manifests (now including `backend/src/zerobox/__init__.py`, added to the procedure in `#136`) plus `package-lock.json` / `Cargo.lock`. Minor: new backward-compatible user-facing feature (updater `#136`–`#138`; `#139` docs). Tagged `v0.8.0`, built MSI + NSIS via `scripts/build-installer.ps1`, published the GitHub Release with both installers and tag-pinned doc links.
+**Result:** Branch `release/0.8.0`. `v0.8.0` live.
+
 ### `2026-07-22` — `#139`: Generic in-app updater description as reusable foundation (docs)
 **Request:** Meta ticket (by-product of the updater port): capture the update system's sub-functionalities as a short generic description for future projects, analogous to `docs/windows-installer.md` (`#134`).
 **Done:** New `docs/in-app-updater.md`: flow overview, `11` components (version source, release feed, semver compare, asset selection, check endpoint, trusted download, detached launch, app self-termination, GUI: silent startup check / manual dismiss-first check / banner confirm flow), security invariants, Receipt Board vs. zerobox reference table, adaptation checklist. Linked from `README.md` (docs tree) and `docs/architecture.md` (updater-flow section). Not added to the in-app Help tab — consistent with `windows-installer.md` (dev-facing docs stay out of the fixed `sync-docs.mjs` list).
