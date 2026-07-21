@@ -203,6 +203,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-07-22` — `#137`: Updater download + launch installer, then quit the app
+**Request:** Second updater slice (analog to receipt-board#82): `POST /update/install`.
+**Done:** `updates.py` gained `is_trusted_asset_url` (GitHub hosts only), `download_installer` (streams to `%APPDATA%/zerobox/updates`), `launch_installer` (detached subprocess). `POST /update/install` re-resolves the release server-side (client URL never trusted), validates the asset host, downloads, launches, then exits the backend via a delayed `schedule_shutdown` (Tauri adaptation of Receipt Board's pywebview shutdown hook — the sidecar exits itself; the frontend closes the window in `#138`). Error paths: `409` no update, `400` untrusted host, `502` download failure. `12` new tests (mock transport, monkeypatched launcher/shutdown); Postman `Install Update` request; `docs/architecture.md` updated.
+**Result:** Branch `feature/updater-install`. All `279` backend tests green.
+
 ### `2026-07-22` — `#136`: Updater backend — version check against public GitHub Releases
 **Request:** Port the Receipt Board in-app updater to zerobox (autonomous `/goal`; analog to receipt-board#81). First slice: the backend update-check.
 **Done:** New `backend/src/zerobox/updates.py` (semver parse/compare, fetch latest release via unauthenticated GitHub REST API with `httpx`, select the `*-setup.exe` NSIS asset, build `UpdateInfo`); new route `GET /update/check` (network failure → `502`); repo slug overridable via `ZEROBOX_GITHUB_REPO`. Introduced `zerobox.__version__` as the backend's single version source — fixes the stale hardcoded `0.5.1` in `app.py`; `CLAUDE.md` release manifest list extended accordingly. `26` new tests (`httpx.MockTransport`, no real network); Postman collection gained an `Updates` folder; `docs/architecture.md` updated (module, route, endpoint table).
