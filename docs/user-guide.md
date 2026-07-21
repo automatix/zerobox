@@ -140,6 +140,21 @@ Read-only view of the merged configuration (`config.json` + `.env`). API keys ar
 
 Renders this user guide and the technical docs (`README.md`, `architecture.md`, `dev-testing.md`, `roadmap.md`) directly inside the app. The docs are bundled with the installer — no network access required after install. Sidebar on the left lets you switch between documents. Source of truth for every doc is still the corresponding `.md` file in the repo; the build step copies them into the app at compile time.
 
+### Updates
+
+zerobox checks for new versions against the public GitHub Releases of `automatix/zerobox`.
+
+- **On startup**, the app checks silently. If a newer version exists, a non-blocking banner appears below the header: `New version vX.Y.Z available (installed: vA.B.C).` If you are offline the check fails quietly — no error, no banner.
+- **Manually**, click the **Updates** button in the header at any time. You always get feedback: either the banner (update available) or an `up to date` toast. Clicking it while a banner is already visible re-runs the check — the banner briefly disappears and returns with the fresh result.
+
+The banner offers:
+
+- **What's new** — opens the release notes on GitHub in your browser.
+- **Install now** — downloads the installer (`zerobox_X.Y.Z_x64-setup.exe`) from GitHub, launches it, and closes zerobox so the installer can replace the files. The installer runs interactively with the usual UAC prompt — nothing is installed silently.
+- **Later** — dismisses the banner until the next check.
+
+Updates are **never** installed automatically; installing always requires clicking **Install now**.
+
 ---
 
 ## Typical Workflow

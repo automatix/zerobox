@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { getVersion } from '@tauri-apps/api/app';
   import { api } from './lib/api';
+  import { checkForUpdatesManually, checkForUpdatesOnStartup } from './lib/updates.svelte';
   import ReviewTable from './views/ReviewTable.svelte';
   import RuleProfiles from './views/RuleProfiles.svelte';
   import AuditLog from './views/AuditLog.svelte';
@@ -7,6 +9,7 @@
   import HelpTab from './views/HelpTab.svelte';
   import SetupWizard from './views/SetupWizard.svelte';
   import ToastContainer from './views/ToastContainer.svelte';
+  import UpdateBanner from './views/UpdateBanner.svelte';
 
   type Tab = 'review' | 'rules' | 'audit' | 'settings' | 'help';
 
@@ -21,6 +24,8 @@
   let activeTab: Tab = $state('review');
   let setupComplete: boolean | null = $state(null); // null = loading
   let setupError: string | null = $state(null);
+  let appVersion: string | null = $state(null);
+  let updateCheckDone = false;
 
   async function checkSetup() {
     setupError = null;
@@ -34,6 +39,18 @@
 
   $effect(() => {
     checkSetup();
+    // Outside Tauri (browser dev mode) getVersion rejects — keep the fallback quiet.
+    getVersion()
+      .then((v) => { appVersion = v; })
+      .catch(() => { appVersion = null; });
+  });
+
+  // Silent update check once the main view is up (not during the setup wizard).
+  $effect(() => {
+    if (setupComplete && !updateCheckDone) {
+      updateCheckDone = true;
+      checkForUpdatesOnStartup();
+    }
   });
 </script>
 
@@ -69,9 +86,21 @@
     <header class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <h1 class="text-xl font-bold text-gray-900 tracking-tight">zerobox</h1>
-        <span class="text-xs text-gray-400">v0.5.1</span>
+        <div class="flex items-center gap-3">
+          <button
+            onclick={() => checkForUpdatesManually()}
+            class="text-xs font-medium text-gray-500 border border-gray-300 rounded px-2 py-1 hover:text-gray-700 hover:border-gray-400"
+          >
+            Updates
+          </button>
+          {#if appVersion}
+            <span class="text-xs text-gray-400">v{appVersion}</span>
+          {/if}
+        </div>
       </div>
     </header>
+
+    <UpdateBanner />
 
     <!-- Tab navigation -->
     <nav class="bg-white border-b border-gray-200">

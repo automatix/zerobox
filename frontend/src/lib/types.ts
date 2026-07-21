@@ -39,3 +39,11 @@ export interface AuditEntry {
 export interface AppConfig {
   [key: string]: unknown;
 }
+
+export interface UpdateInfo {
+  current: string;
+  latest: string | null;
+  update_available: boolean;
+  notes_url: string | null;
+  asset_url: string | null;
+}
