@@ -1,4 +1,6 @@
-"""Unit tests for the update-check core module (#136)."""
+"""Unit tests for the updater core module (#136, #137)."""
+
+from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
@@ -118,3 +120,55 @@ class TestCheckForUpdate:
         client = httpx.Client(transport=httpx.MockTransport(handler))
         with pytest.raises(httpx.HTTPStatusError):
             updates.check_for_update("0.7.0", client=client)
+
+
+class TestIsTrustedAssetUrl:
+    @pytest.mark.parametrize(
+        ("url", "expected"),
+        [
+            ("https://github.com/automatix/zerobox/releases/download/v1/x-setup.exe", True),
+            ("https://objects.githubusercontent.com/abc", True),
+            ("https://evil.example.com/x-setup.exe", False),
+            ("https://github.com.evil.example.com/x-setup.exe", False),
+        ],
+    )
+    def test_hosts(self, url, expected):
+        assert updates.is_trusted_asset_url(url) is expected
+
+
+class TestDownloadInstaller:
+    def test_writes_file(self, tmp_path):
+        payload = b"MZ fake installer bytes"
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(200, content=payload)
+
+        client = httpx.Client(transport=httpx.MockTransport(handler))
+        dest = updates.download_installer(
+            "https://github.com/x/y/releases/download/v1/zerobox_1.0.0_x64-setup.exe",
+            tmp_path / "updates",
+            client=client,
+        )
+
+        assert dest.name == "zerobox_1.0.0_x64-setup.exe"
+        assert dest.read_bytes() == payload
+
+    def test_http_error_raises(self, tmp_path):
+        def handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(404)
+
+        client = httpx.Client(transport=httpx.MockTransport(handler))
+        with pytest.raises(httpx.HTTPStatusError):
+            updates.download_installer("https://github.com/gone.exe", tmp_path, client=client)
+
+
+class TestLaunchInstaller:
+    def test_spawns_detached_process(self, tmp_path):
+        installer = tmp_path / "zerobox-setup.exe"
+        installer.write_bytes(b"MZ")
+
+        with patch.object(updates.subprocess, "Popen", return_value=MagicMock()) as popen:
+            updates.launch_installer(installer)
+
+        popen.assert_called_once()
+        assert popen.call_args.args[0] == [str(installer)]
