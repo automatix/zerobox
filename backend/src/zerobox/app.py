@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from zerobox import __version__
 from zerobox.config import AppConfig, load_config
 
 ALLOWED_ORIGINS = [
@@ -16,7 +17,7 @@ ALLOWED_ORIGINS = [
 
 def create_app() -> FastAPI:
     config = load_config()
-    app = FastAPI(title="zerobox", version="0.5.1")
+    app = FastAPI(title="zerobox", version=__version__)
     app.state.config = config
     app.state.proposals: dict[str, dict] = {}
 
@@ -64,12 +65,13 @@ def create_app() -> FastAPI:
         return _get_cached_config().model_dump(mode="json")
 
     # Include routers
-    from zerobox.api.routes import audit, pipeline, proposals, rules, setup
+    from zerobox.api.routes import audit, pipeline, proposals, rules, setup, update
 
     app.include_router(setup.router, prefix="/setup", tags=["setup"])
     app.include_router(pipeline.router, prefix="/pipeline", tags=["pipeline"])
     app.include_router(proposals.router, prefix="/proposals", tags=["proposals"])
     app.include_router(rules.router, prefix="/rules", tags=["rules"])
     app.include_router(audit.router, prefix="/audit", tags=["audit"])
+    app.include_router(update.router, prefix="/update", tags=["update"])
 
     return app

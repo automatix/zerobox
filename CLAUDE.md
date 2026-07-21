@@ -57,7 +57,7 @@ After every change, update the **tests** and the **documentation** to match. Kee
 This project uses Semantic Versioning (`semver.org`). After each commit, evaluate whether a new version release is warranted. Announce version bumps with a brief rationale (patch / minor / major).
 
 When releasing a new version:
-`1.` Update version in all manifests (`backend/pyproject.toml`, `frontend/package.json`, `frontend/src-tauri/Cargo.toml`, `frontend/src-tauri/tauri.conf.json`)
+`1.` Update version in all manifests (`backend/pyproject.toml`, `backend/src/zerobox/__init__.py`, `frontend/package.json`, `frontend/src-tauri/Cargo.toml`, `frontend/src-tauri/tauri.conf.json`)
 `2.` Create an annotated Git tag (`git tag -a vX.Y.Z`)
 `3.` Build installers via `scripts/build-installer.ps1`
 `4.` Create a GitHub Release with the installer artifacts (MSI + NSIS) attached. Release notes include a **Documentation** section with tag-pinned links to the relevant `.md` files: `https://github.com/automatix/zerobox/blob/vX.Y.Z/docs/user-guide.md`, `…/docs/architecture.md`, `…/docs/dev-testing.md`, `…/docs/roadmap.md`, `…/README.md`. Tag-pinned so the URL snapshots the doc at that version.
