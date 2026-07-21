@@ -203,6 +203,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-07-22` — `#151`: Release `v0.8.1` (patch — startup hotfix for the packaged app)
+**Request:** Ship the fixed installer (`/goal` finale of the `v0.8.0`-broken incident).
+**Done:** Bumped `0.8.0` → `0.8.1` (all `5` manifests + locks). Patch: pure bugfixes — `#146` (frozen sidecar: static app import, writable streams, build smoke test) and `#147` (provider registration). Built installers via `scripts/build-installer.ps1` (smoke test green), published the GitHub Release; `v0.8.0` release notes got a prominent broken-release warning pointing to `v0.8.1`. Also filed `#150`: the updater cannot work while the repo is private (unauthenticated GitHub API → `404`) — feed-strategy decision left to the user.
+**Result:** Branch `release/0.8.1`. `v0.8.1` live.
+
 ### `2026-07-22` — `#147`: LLM provider registry empty at runtime — AnthropicProvider never registered
 **Request:** Second bug found while diagnosing `#146`: no production code imports `providers/anthropic.py`, so `@register("anthropic")` never runs — `create_provider` raises `Unknown LLM provider: 'anthropic'. Available: []` at pipeline time. Unit tests import the module directly, masking it.
 **Done:** Bottom-of-package import in `providers/__init__.py` (classic registry pattern; `register` is defined before the import, no cycle). Side benefit: PyInstaller now traces the `anthropic` SDK into the frozen bundle via the normal import graph. `2` regression tests in a new `test_provider_builtin_registration.py` — separate file because `test_provider_registry.py`'s autouse fixture clears the registry per test.
