@@ -724,6 +724,43 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Updates",
+			"description": "In-app updater endpoints: check for a newer public GitHub Release.",
+			"item": [
+				{
+					"name": "Check for Update",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/update/check",
+							"host": ["{{base_url}}"],
+							"path": ["update", "check"]
+						},
+						"description": "Compares the running backend version against the latest public GitHub Release of automatix/zerobox. Returns current/latest versions, whether an update is available, the release-notes URL, and the NSIS installer asset URL. Returns 502 when the update server is unreachable."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Update info shape\", function() {",
+									"    pm.response.to.have.status(200);",
+									"    var json = pm.response.json();",
+									"    pm.expect(json).to.have.property(\"current\");",
+									"    pm.expect(json).to.have.property(\"latest\");",
+									"    pm.expect(json).to.have.property(\"update_available\");",
+									"});"
+								]
+							}
+						}
+					],
+					"response": []
+				}
+			]
 		}
 	]
 }
