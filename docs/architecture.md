@@ -28,7 +28,7 @@ zerobox/
 │   │       ├── __init__.py
 │   │       ├── app.py                  # FastAPI app factory
 │   │       ├── config.py               # Pydantic settings (all config + defaults)
-│   │       ├── updates.py              # In-app update check (GitHub Releases)
+│   │       ├── updates.py              # In-app updater (GitHub Releases): check, download, launch
 │   │       │
 │   │       ├── intake/                 # Module: file discovery
 │   │       │   ├── __init__.py
@@ -77,7 +77,7 @@ zerobox/
 │   │           │   ├── proposals.py    # GET/PATCH /proposals
 │   │           │   ├── rules.py        # CRUD /rules/profiles
 │   │           │   ├── audit.py        # GET /audit/log
-│   │           │   └── update.py       # GET /update/check
+│   │           │   └── update.py       # GET /update/check, POST /update/install
 │   │           └── dependencies.py     # FastAPI dependency injection
 │   │
 │   ├── tests/
@@ -119,7 +119,7 @@ zerobox/
 | `filemanager` | Rename + move with rollback support | — |
 | `audit` | SQLite action log | `AuditEntry` |
 | `pipeline` | Orchestrates the full workflow | — |
-| `updates` | In-app update check against public GitHub Releases | `UpdateInfo` |
+| `updates` | In-app updater against public GitHub Releases (check, trusted download, detached launch) | `UpdateInfo` |
 | `api` | FastAPI HTTP routes | — |
 
 Each module exposes a `service.py` with its public interface. Modules do not import each other directly — dependencies are injected via constructors.
@@ -344,6 +344,7 @@ Tauri launches the Python backend as a **sidecar process**. All communication go
 | `POST` | `/rules/profiles/{id}/rules` | Add a rule to a profile |
 | `GET` | `/audit/log` | Query audit log |
 | `GET` | `/update/check` | Compare running version against the latest GitHub Release |
+| `POST` | `/update/install` | Download the latest installer, launch it, exit the backend |
 
 ---
 

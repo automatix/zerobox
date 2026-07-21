@@ -727,7 +727,7 @@
 		},
 		{
 			"name": "Updates",
-			"description": "In-app updater endpoints: check for a newer public GitHub Release.",
+			"description": "In-app updater endpoints: check for a newer public GitHub Release and install it.",
 			"item": [
 				{
 					"name": "Check for Update",
@@ -758,6 +758,20 @@
 							}
 						}
 					],
+					"response": []
+				},
+				{
+					"name": "Install Update",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/update/install",
+							"host": ["{{base_url}}"],
+							"path": ["update", "install"]
+						},
+						"description": "Re-resolves the latest release server-side, downloads the NSIS installer asset to the per-user config dir (updates/), launches it detached, and exits the backend shortly after responding. Returns 409 when no newer installer is available, 400 for an untrusted asset host, 502 on download failure. WARNING: on success this launches a real installer and stops the backend."
+					},
 					"response": []
 				}
 			]
