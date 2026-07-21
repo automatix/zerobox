@@ -1,8 +1,13 @@
 import { addToast } from './toast.svelte';
+import type { UpdateInfo } from './types';
 
 const BASE_URL = 'http://localhost:8000';
 
-export async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
+export async function fetchJson<T>(
+  path: string,
+  options?: RequestInit,
+  notifyError = true
+): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
@@ -12,10 +17,11 @@ export async function fetchJson<T>(path: string, options?: RequestInit): Promise
     try {
       const body = await res.json();
       if (body.error) message = body.error;
+      else if (body.detail) message = body.detail;
     } catch {
       // ignore parse errors
     }
-    addToast(message, 'error');
+    if (notifyError) addToast(message, 'error');
     throw new Error(message);
   }
   return res.json();
@@ -92,6 +98,15 @@ export const api = {
 
   // Config
   getConfig: () => fetchJson('/config'),
+
+  // Updates (in-app updater)
+  checkUpdate: (opts?: { silent?: boolean }) =>
+    fetchJson<UpdateInfo>('/update/check', undefined, !opts?.silent),
+  installUpdate: () =>
+    fetchJson<{ launched: boolean; version: string | null; installer: string }>(
+      '/update/install',
+      { method: 'POST' }
+    ),
 
   // Setup (First-Run-Wizard)
   getSetupStatus: () => fetchJson<{
