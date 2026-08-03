@@ -203,6 +203,7 @@ zerobox/
 ├── docs/
 │   ├── architecture.md       # Living architecture document
 │   ├── in-app-updater.md     # Generic in-app updater foundation (reusable)
+│   ├── memory-md.md          # Generic MEMORY.md project-journal pattern (reusable)
 │   └── postman/              # Postman collection
 ├── CLAUDE.md
 └── README.md

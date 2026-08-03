@@ -203,6 +203,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-08-03` — `#154`: Generic `MEMORY.md` project-journal pattern as reusable foundation (docs)
+**Request:** User asked why `MEMORY.md` exists in this project and wanted the pattern described generically, reusable for another project — first as an explanation, then as a proper repo doc with a ready-to-use prompt for bootstrapping the pattern in a fresh project via another Claude instance.
+**Done:** New `docs/memory-md.md`: purpose vs. `CLAUDE.md`/architecture docs/git history, the five-section structure (`FR-*`/`NFR-*`/`DD-*`/`IDEA-*` + chronological Work Log), core maintenance rules (stable IDs, supersede instead of delete, Request/Done/Result entries, absolute dates), an adaptation checklist, and a copy-paste prompt block for a new Claude instance in another project. Linked from `README.md`'s project-structure tree, same treatment as `in-app-updater.md` (dev-facing meta doc, intentionally excluded from `frontend/scripts/sync-docs.mjs`'s fixed doc list / in-app Help tab).
+**Result:** Branch `chore/154-memory-md-doc`. Docs-only, no version bump.
+
 ### `2026-07-22` — `#150`: Updater feed strategy resolved — repo made public
 **Request:** User decision on `#150`: the repo `automatix/zerobox` is now **public** (option `1`, matching the Receipt Board model).
 **Done:** No code change (`DEFAULT_REPO` already `automatix/zerobox`). Verified end-to-end against the live unauthenticated GitHub API: simulated `0.8.0` install → `update_available: true` with correct notes URL + trusted NSIS asset URL; current `0.8.1` → up to date. The in-app **Updates** button and silent startup check are functional in installed `v0.8.1` apps.
