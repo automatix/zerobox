@@ -65,7 +65,7 @@ design decisions, problems, solutions, and ideas for future work.
 
 ## Variant: Splitting Out the Backlog
 
-Once `## Ideas / Future` grows past a handful of entries, it starts to clutter a document that is otherwise about requirements and decisions. Optionally split it into its own `BACKLOG.md` at the project root — see `backlog-md.md` for the generic, reusable description of that pattern.
+Once `## Ideas / Future` grows past a handful of entries, it starts to clutter a document that is otherwise about requirements and decisions. Optionally split it into its own `BACKLOG.md` at the project root — see `BACKLOG.md-pattern.md` for the generic, reusable description of that pattern.
 
 This repository uses that variant (`BACKLOG.md`, split out in `#156`); the single-file version above remains the simpler default for a new project.
 

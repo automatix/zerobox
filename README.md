@@ -201,10 +201,10 @@ zerobox/
 ├── profiles/                 # User rule profiles (JSON)
 ├── scripts/                  # Build and installer scripts
 ├── docs/
+│   ├── BACKLOG.md-pattern.md # Generic BACKLOG.md idea-backlog pattern (reusable)
+│   ├── MEMORY.md-pattern.md  # Generic MEMORY.md project-journal pattern (reusable)
 │   ├── architecture.md       # Living architecture document
-│   ├── backlog-md.md         # Generic BACKLOG.md idea-backlog pattern (reusable)
 │   ├── in-app-updater.md     # Generic in-app updater foundation (reusable)
-│   ├── memory-md.md          # Generic MEMORY.md project-journal pattern (reusable)
 │   └── postman/              # Postman collection
 ├── CLAUDE.md
 └── README.md
