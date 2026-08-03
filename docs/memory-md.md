@@ -65,11 +65,7 @@ design decisions, problems, solutions, and ideas for future work.
 
 ## Variant: Splitting Out the Backlog
 
-Once `## Ideas / Future` grows past a handful of entries, it starts to clutter a document that is otherwise about requirements and decisions. Optionally split it into its own `BACKLOG.md` at the project root:
-
-- `BACKLOG.md` holds the `IDEA-*` list verbatim, with a short header on its purpose and its relation to `MEMORY.md` (journal) and the ticket system (actual planned work).
-- `MEMORY.md` drops the `## Ideas / Future` section entirely — no pointer needed once `CLAUDE.md`'s documentation list references both files.
-- Same ID conventions apply: `IDEA-*` ids stay stable and are never reused, whichever file they live in.
+Once `## Ideas / Future` grows past a handful of entries, it starts to clutter a document that is otherwise about requirements and decisions. Optionally split it into its own `BACKLOG.md` at the project root — see `backlog-md.md` for the generic, reusable description of that pattern.
 
 This repository uses that variant (`BACKLOG.md`, split out in `#156`); the single-file version above remains the simpler default for a new project.
 

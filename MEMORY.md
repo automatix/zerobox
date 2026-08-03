@@ -184,6 +184,11 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ## Work Log
 
+### `2026-08-03` — `#154`: Companion `docs/backlog-md.md` — generic `BACKLOG.md` idea-backlog pattern (docs)
+**Request:** Extend `#154`'s scope (ticket reopened rather than filing a new one): produce the same kind of generic, reusable pattern description for `BACKLOG.md` that `docs/memory-md.md` provides for `MEMORY.md`.
+**Done:** New `docs/backlog-md.md`: purpose vs. a project journal / ticket system / git history, the generic structure (flat `IDEA-*` list, optional `##` grouping), core rules (stable ids, entries survive being picked up into a ticket, short entries), a "when to split it out of a journal" section, an adaptation checklist, and a copy-paste bootstrap prompt for a new Claude instance. `docs/memory-md.md`'s "Variant: Splitting Out the Backlog" section now links to it instead of duplicating the explanation. Linked from `README.md`'s project-structure tree, same treatment as the other reusable-foundation docs.
+**Result:** Branch `chore/154-memory-md-doc` (continued). Docs-only, no version bump.
+
 ### `2026-08-03` — `#156`: Split `Ideas / Future` backlog out of `MEMORY.md` into `BACKLOG.md`
 **Request:** Move the idea backlog into its own file, separate from the requirements/decisions journal.
 **Done:** New `BACKLOG.md` at the project root with the `IDEA-01`–`IDEA-14` entries moved verbatim, plus a short header on its purpose and relation to `MEMORY.md` and GitHub Issues. Removed the `## Ideas / Future` section from `MEMORY.md`. `CLAUDE.md` Key Documentation list updated: `MEMORY.md` entry drops the `ideas (IDEA-*)` mention, new `BACKLOG.md` entry added. `docs/memory-md.md` (the generic reusable pattern doc, `#154`) gained a note on this as an optional variant.

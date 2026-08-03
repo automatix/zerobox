@@ -202,6 +202,7 @@ zerobox/
 ├── scripts/                  # Build and installer scripts
 ├── docs/
 │   ├── architecture.md       # Living architecture document
+│   ├── backlog-md.md         # Generic BACKLOG.md idea-backlog pattern (reusable)
 │   ├── in-app-updater.md     # Generic in-app updater foundation (reusable)
 │   ├── memory-md.md          # Generic MEMORY.md project-journal pattern (reusable)
 │   └── postman/              # Postman collection
