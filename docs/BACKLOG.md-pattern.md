@@ -1,6 +1,6 @@
 # BACKLOG.md — Idea Backlog Pattern (Reusable Foundation)
 
-A generic, project-independent description of the `BACKLOG.md` pattern used in this repository (see `BACKLOG.md` for the concrete instance). Split out of the project journal once its idea list grew (`#156`); companion piece to `memory-md.md` (`#154`), `windows-installer.md` (`#134`), and `in-app-updater.md` (`#139`).
+A generic, project-independent description of the `BACKLOG.md` pattern used in this repository (see `BACKLOG.md` for the concrete instance). Split out of the project journal once its idea list grew (`#156`); companion piece to `MEMORY.md-pattern.md` (`#154`), `windows-installer.md` (`#134`), and `in-app-updater.md` (`#139`).
 
 ---
 
@@ -43,7 +43,7 @@ A single flat list is enough for most projects. If the backlog grows large, grou
 
 ## When to Split It Out of a Journal
 
-Projects that already keep a requirements/decisions journal often start with ideas as a section inside that same file (e.g. `## Ideas / Future` inside `MEMORY.md`). That's a reasonable starting point. Split it into a dedicated `BACKLOG.md` once the idea list grows past a handful of entries and starts crowding out the requirements/decisions content — same `IDEA-*` ids, no renumbering, just a new home. See `memory-md.md` for the single-file starting point this pattern splits out of.
+Projects that already keep a requirements/decisions journal often start with ideas as a section inside that same file (e.g. `## Ideas / Future` inside `MEMORY.md`). That's a reasonable starting point. Split it into a dedicated `BACKLOG.md` once the idea list grows past a handful of entries and starts crowding out the requirements/decisions content — same `IDEA-*` ids, no renumbering, just a new home. See `MEMORY.md-pattern.md` for the single-file starting point this pattern splits out of.
 
 ---
 
