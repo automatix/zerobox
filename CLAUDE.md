@@ -22,7 +22,8 @@ Backend (Python `3.13` + FastAPI) runs as a Tauri sidecar process, communicating
 
 ## Key Documentation
 
-- `MEMORY.md` — project journal: requirements (`FR-*`), non-functional requirements (`NFR-*`), design decisions (`DD-*`), ideas (`IDEA-*`)
+- `MEMORY.md` — project journal: requirements (`FR-*`), non-functional requirements (`NFR-*`), design decisions (`DD-*`)
+- `BACKLOG.md` — idea backlog, not yet tickets (`IDEA-*`)
 - `docs/architecture.md` — living architecture document (directory structure, modules, interfaces, data flow, config model). **Update this file with every architectural change.**
 - `docs/roadmap.md` — phased roadmap (`7` phases) with `29` tickets
 

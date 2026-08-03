@@ -182,26 +182,12 @@ The AI classification module supports multiple LLM backends (Claude, OpenAI, loc
 
 ---
 
-## Ideas / Future
-
-- `IDEA-01` — **Offline mode with local LLM** (e.g., Ollama + Mistral/Llama) as fallback when no API key is configured or for privacy-sensitive documents.
-- `IDEA-02` — **Watch mode** — monitor the input folder for new files and auto-trigger the pipeline (instead of manual "Knopfdruck").
-- `IDEA-03` — **Cross-platform support** — Tauri already supports macOS/Linux; Python backend is OS-agnostic.
-- `IDEA-04` — **Rule sharing** — export/import rule profiles for community sharing.
-- `IDEA-05` — **Duplicate detection** — flag files that appear to be duplicates of already-filed documents.
-- `IDEA-06` — **Preview pane** — show a thumbnail/preview of the scanned document alongside the classification result in the review table.
-- `IDEA-07` — **Test coverage tooling** — add `pytest-cov` to dev dependencies and configure coverage reporting.
-- `IDEA-08` — **User-defined LLM providers** — allow users to register a custom provider entry in the First-Run-Wizard / Settings (name, base URL, model, auth scheme) instead of picking from the fixed list (`anthropic`, `openai`, `ollama`). Useful for OpenAI-compatible gateways (Azure OpenAI, LiteLLM, LocalAI, Groq, self-hosted vLLM, etc.).
-- `IDEA-09` — **Model picker assistance** — keep the model field as free text (user remains in control) but enrich it with provider-aware assistance: live-fetch the list of available models from the selected provider (Anthropic `/v1/models`, OpenAI `/v1/models`, Ollama `/api/tags` — where the API key is already known, it scopes the list to what the user actually has access to) and show them as autocomplete suggestions. If the user commits a value that is **not** in the suggestion list, show a subtle inline warning that the model is likely unavailable (wrong name or not accessible with this key). Fall back to a curated static list per provider if the discovery call fails, and optionally surface metadata (context window, approximate cost, capability tags).
-- `IDEA-10` — **OCR language chips with autocomplete** — in the OCR step of the First-Run-Wizard, replace the free-text `"deu+eng"` input with a tag/chip input: each selected language renders as a removable chip, and typing offers autocomplete against the list of installed Tesseract languages (discoverable via `tesseract --list-langs`). The final config value is still the `+`-joined Tesseract string. Makes the format self-documenting and avoids typos like `ger` (invalid) vs `deu` (correct).
-- `IDEA-11` — **Folder picker in Wizard** — replace the free-text folder inputs (`input_folder`, `output_root`, `profiles_dir`) in the Folders step with a native folder-browse button (Tauri `dialog.open({ directory: true })`). Falls back to the current text input when running in a plain browser (Vite dev without Tauri shell). Reduces typos and makes path selection discoverable.
-- `IDEA-12` — **Editable Settings tab** — `frontend/src/views/Settings.svelte` currently renders the live config read-only ("Edit the config file directly to make changes."). Make it editable: per-section forms backed by the same Pydantic schema as `config.json` / the wizard, validation client- and server-side, a `PATCH /config` (or `PUT /setup/save`-equivalent) endpoint to persist, and a clear "save" / "reset" workflow. Cover both `config.json` fields and the secrets in `.env` (with masked input).
-- `IDEA-13` — **Ship documentation with the release** — bundle both end-user docs (`README.md`) and technical/dev docs (`docs/architecture.md`, `docs/dev-testing.md`, `docs/roadmap.md`, Postman collection) with the installer/release artifacts. Options to explore: (a) static HTML rendered from the Markdown at build time and bundled as Tauri resources, surfaced via an in-app "Help" tab; (b) a `docs.zip` attached alongside the MSI/NSIS on the GitHub Release; (c) both. Keep the single source of truth in the repo's `.md` files; rendering happens at build time.
-- `IDEA-14` — **Revisit REST shape of resource creation** — current state (per `DD-08`) is pragmatic: `POST /rules/profiles` accepts an optional `id` in the body and generates one when absent. The strict-REST alternative would be `POST /rules/profiles {name, description}` (server always assigns the id, returned in the response and `Location` header) plus `PUT /rules/profiles/{id} {...}` as an idempotent upsert for the rarer "I want this exact id" case (imports, backups, sync). Decide in the context of: (a) whether bulk import / restore lands (`IDEA-04` rule sharing), (b) whether the API is consumed by anything beyond the in-app frontend, (c) whether client-side offline mode (`IDEA-01`) needs client-generated UUIDs. Apply the same shape to `/rules/profiles/{id}/rules` for consistency. Touches: backend route schemas + handlers, Postman collection, BDD scenarios, frontend API client.
-
----
-
 ## Work Log
+
+### `2026-08-03` — `#156`: Split `Ideas / Future` backlog out of `MEMORY.md` into `BACKLOG.md`
+**Request:** Move the idea backlog into its own file, separate from the requirements/decisions journal.
+**Done:** New `BACKLOG.md` at the project root with the `IDEA-01`–`IDEA-14` entries moved verbatim, plus a short header on its purpose and relation to `MEMORY.md` and GitHub Issues. Removed the `## Ideas / Future` section from `MEMORY.md`. `CLAUDE.md` Key Documentation list updated: `MEMORY.md` entry drops the `ideas (IDEA-*)` mention, new `BACKLOG.md` entry added. `docs/memory-md.md` (the generic reusable pattern doc, `#154`) gained a note on this as an optional variant.
+**Result:** Branch `chore/156-backlog-md-split`. Docs-only, no version bump.
 
 ### `2026-08-03` — `#154`: Generic `MEMORY.md` project-journal pattern as reusable foundation (docs)
 **Request:** User asked why `MEMORY.md` exists in this project and wanted the pattern described generically, reusable for another project — first as an explanation, then as a proper repo doc with a ready-to-use prompt for bootstrapping the pattern in a fresh project via another Claude instance.
